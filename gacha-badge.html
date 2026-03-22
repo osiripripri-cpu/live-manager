@@ -1,0 +1,1731 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="fancy">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>StallKit</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Nunito+Sans:wght@400;600;700&family=Noto+Sans+JP:wght@400;700&family=Orbitron:wght@700;900&family=Zen+Kaku+Gothic+New:wght@400;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Nunito+Sans:wght@400;600;700&family=Noto+Sans+JP:wght@400;700&display=swap');
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#fff0f8;
+  --bg2:#fce8f5;
+  --card:#ffffff;
+  --card2:#fff8fd;
+  --pink:#ff6eb4;
+  --pink2:#ffb3d9;
+  --pink3:#ffe0f0;
+  --purple:#a855f7;
+  --purple2:#d8b4fe;
+  --purple3:#f3e8ff;
+  --cyan:#22d3ee;
+  --cyan2:#a5f3fc;
+  --yellow:#fbbf24;
+  --yellow2:#fef08a;
+  --green:#10b981;
+  --green2:#6ee7b7;
+  --red:#f43f5e;
+  --text:#3b1f4e;
+  --muted:#a78bbd;
+  --border:#f0c8e8;
+  --shadow:rgba(168,85,247,0.12);
+}
+
+body{
+  font-family:'Nunito Sans','Noto Sans JP',sans-serif;
+  background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;
+}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse at 10% 0%,rgba(255,110,180,0.18) 0%,transparent 45%),
+    radial-gradient(ellipse at 90% 5%,rgba(168,85,247,0.15) 0%,transparent 40%),
+    radial-gradient(ellipse at 50% 100%,rgba(34,211,238,0.12) 0%,transparent 40%);
+}
+
+/* floating dots decoration */
+body::after{
+  content:'✦ ✿ ★ ✦ ✿ ★ ✦ ✿ ★ ✦ ✿ ★ ✦ ✿ ★';
+  position:fixed;top:0;left:0;right:0;
+  font-size:0.65rem;color:rgba(168,85,247,0.12);
+  letter-spacing:2.2rem;word-spacing:0;
+  line-height:2.2rem;pointer-events:none;z-index:0;
+  white-space:nowrap;overflow:hidden;
+  padding:0.4rem 0.8rem;
+}
+
+.app{position:relative;z-index:1;max-width:820px;margin:0 auto;padding:20px 14px 48px;display:flex;flex-direction:column;align-items:center;gap:18px;}
+
+/* header */
+header{text-align:center;width:100%;}
+.header-deco{
+  font-size:1.1rem;letter-spacing:0.3em;display:block;margin-bottom:2px;
+  background:linear-gradient(90deg,var(--pink),var(--purple),var(--cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+h1{
+  font-family:'Nunito',sans-serif;font-weight:900;
+  font-size:clamp(1.2rem,4.5vw,2rem);
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  letter-spacing:0.03em;line-height:1.25;
+}
+.header-line{width:100%;max-width:280px;height:2px;background:linear-gradient(90deg,transparent,var(--pink2),var(--purple2),transparent);margin:8px auto 0;border-radius:2px;}
+
+/* ── Tabs ── */
+.tabs{display:flex;background:var(--card);border:2px solid var(--border);border-radius:20px;overflow:hidden;width:100%;max-width:640px;padding:4px;gap:3px;box-shadow:0 4px 16px var(--shadow);}
+.tab-btn{flex:1;padding:9px 2px;background:transparent;border:none;font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:800;letter-spacing:0.02em;color:var(--muted);cursor:pointer;transition:background 0.2s,color 0.2s,box-shadow 0.2s;border-radius:14px;}
+.tab-btn.active{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;box-shadow:0 3px 12px rgba(168,85,247,0.35);}
+.panel{display:none;width:100%;}
+.panel.active{display:flex;flex-direction:column;align-items:center;gap:16px;}
+
+/* ── Card ── */
+.card{
+  width:100%;background:var(--card);
+  border:2px solid var(--border);border-radius:20px;
+  padding:18px 16px;
+  box-shadow:0 4px 20px var(--shadow),0 1px 0 rgba(255,255,255,0.9) inset;
+  position:relative;
+}
+.card h2{
+  font-family:'Nunito',sans-serif;font-weight:900;font-size:0.82rem;
+  color:var(--purple);margin-bottom:13px;letter-spacing:0.04em;
+  display:flex;align-items:center;gap:7px;
+}
+.card h2::before{content:'';width:4px;height:16px;background:linear-gradient(180deg,var(--pink),var(--purple));border-radius:2px;flex-shrink:0;}
+.card h2::after{content:'';flex:1;height:1.5px;background:linear-gradient(90deg,var(--border),transparent);margin-left:4px;}
+
+/* ── Inputs ── */
+.txt-input{padding:9px 12px;border:2px solid var(--border);border-radius:12px;background:#fff;font-family:'Nunito Sans',sans-serif;font-size:0.86rem;color:var(--text);outline:none;width:100%;transition:border-color 0.2s,box-shadow 0.2s;}
+.txt-input:focus{border-color:var(--purple2);box-shadow:0 0 0 3px rgba(168,85,247,0.12);}
+.txt-input::placeholder{color:var(--muted);}
+.num-input{padding:9px 6px;border:2px solid var(--border);border-radius:12px;background:#fff;font-family:'Nunito Sans',sans-serif;font-size:0.86rem;color:var(--text);outline:none;width:100%;text-align:center;transition:border-color 0.2s,box-shadow 0.2s;}
+.num-input:focus{border-color:var(--purple2);box-shadow:0 0 0 3px rgba(168,85,247,0.12);}
+.del-btn{width:30px;height:30px;border-radius:50%;background:rgba(244,63,94,0.08);border:1.5px solid rgba(244,63,94,0.25);color:var(--red);font-size:0.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.15s,transform 0.1s;}
+.del-btn:hover{background:rgba(244,63,94,0.16);transform:scale(1.1);}
+.add-row-btn{align-self:flex-start;margin-top:6px;padding:7px 16px;background:var(--purple3);border:1.5px dashed var(--purple2);border-radius:12px;font-family:'Nunito',sans-serif;font-size:0.76rem;font-weight:800;color:var(--purple);cursor:pointer;transition:background 0.15s,transform 0.1s;}
+.add-row-btn:hover{background:var(--purple2);color:#fff;transform:scale(1.02);}
+.warn-text{color:var(--red);font-size:0.72rem;margin-top:5px;}
+
+/* ── Register ── */
+.reg-main{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%;}
+@media(max-width:580px){.reg-main{grid-template-columns:1fr;}}
+.reg-left{display:flex;flex-direction:column;gap:12px;}
+.reg-right{display:flex;flex-direction:column;gap:12px;}
+
+.product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;}
+.prod-btn{
+  background:linear-gradient(135deg,#fff,var(--pink3));
+  border:2px solid var(--pink2);border-radius:16px;
+  padding:12px 6px;display:flex;flex-direction:column;align-items:center;gap:6px;
+  cursor:pointer;transition:transform 0.15s,box-shadow 0.15s,border-color 0.15s;
+  font-family:'Nunito',sans-serif;
+}
+.prod-btn:active{transform:scale(0.93);}
+.prod-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(255,110,180,0.25);border-color:var(--pink);}
+.prod-name{font-size:0.76rem;font-weight:700;color:var(--text);text-align:center;line-height:1.3;}
+.prod-price{font-family:'Nunito',sans-serif;font-weight:900;font-size:0.9rem;color:var(--pink);}
+
+.manual-row{display:flex;gap:6px;align-items:center;}
+.manual-add-btn{padding:9px 14px;background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;border:none;border-radius:12px;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:800;cursor:pointer;white-space:nowrap;flex-shrink:0;box-shadow:0 3px 10px rgba(168,85,247,0.3);transition:transform 0.12s,box-shadow 0.12s;}
+.manual-add-btn:hover{transform:translateY(-1px);box-shadow:0 5px 16px rgba(168,85,247,0.4);}
+
+.cart-items{display:flex;flex-direction:column;gap:5px;min-height:36px;}
+.cart-item-row{display:flex;align-items:center;gap:6px;padding:7px 10px;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;font-size:0.82rem;}
+.cart-item-name{flex:1;color:var(--text);font-weight:600;}
+.cart-item-qty{font-size:0.7rem;color:var(--muted);}
+.cart-item-price{font-family:'Nunito',sans-serif;font-weight:900;color:var(--pink);min-width:52px;text-align:right;}
+.cart-del-btn{width:22px;height:22px;border-radius:50%;background:rgba(244,63,94,0.08);border:1.5px solid rgba(244,63,94,0.2);color:var(--red);font-size:0.65rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.15s;}
+.cart-del-btn:hover{background:rgba(244,63,94,0.2);}
+.cart-empty{color:var(--muted);font-size:0.76rem;text-align:center;padding:12px 0;}
+.cart-total-row{display:flex;justify-content:space-between;align-items:baseline;margin-top:10px;padding-top:8px;border-top:1.5px dashed var(--border);}
+.cart-total-label{font-size:0.76rem;color:var(--muted);font-weight:700;}
+.cart-total-amount{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.4rem;color:var(--pink);}
+
+.payment-section{display:flex;flex-direction:column;gap:8px;}
+.payment-row{display:flex;align-items:center;gap:8px;}
+.payment-label{font-size:0.74rem;color:var(--muted);white-space:nowrap;min-width:52px;font-weight:700;}
+.payment-presets{display:flex;gap:5px;flex-wrap:wrap;}
+.preset-btn{padding:6px 10px;background:var(--yellow2);border:1.5px solid var(--yellow);border-radius:10px;font-family:'Nunito',sans-serif;font-weight:800;font-size:0.72rem;color:#7c5800;cursor:pointer;transition:background 0.15s,transform 0.1s;}
+.preset-btn:hover{background:var(--yellow);transform:scale(1.06);}
+.chokiri-btn{
+  padding:6px 12px;background:var(--pink3);border:1.5px solid var(--pink);
+  border-radius:10px;font-family:'Nunito',sans-serif;font-weight:800;
+  font-size:0.76rem;color:var(--pink);cursor:pointer;
+  transition:background 0.15s,transform 0.1s;white-space:nowrap;
+}
+.chokiri-btn:hover{background:var(--pink);color:#fff;transform:scale(1.06);}
+
+.change-display{display:flex;align-items:baseline;gap:7px;padding:11px 14px;border-radius:14px;margin-top:2px;}
+.change-display.positive{background:rgba(16,185,129,0.08);border:2px solid rgba(16,185,129,0.3);}
+.change-display.negative{background:rgba(244,63,94,0.07);border:2px solid rgba(244,63,94,0.25);}
+.change-display.zero{background:var(--bg2);border:2px solid var(--border);}
+.change-label{font-size:0.74rem;color:var(--muted);font-weight:700;}
+.change-amount{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.4rem;}
+.change-amount.positive{color:var(--green);}
+.change-amount.negative{color:var(--red);}
+.change-amount.zero{color:var(--muted);}
+
+.kuji-info-bar{display:flex;align-items:center;gap:7px;padding:10px 14px;background:linear-gradient(90deg,rgba(16,185,129,0.08),rgba(34,211,238,0.06));border:2px solid rgba(16,185,129,0.25);border-radius:14px;font-size:0.8rem;}
+.kuji-times-big{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.3rem;color:var(--green);}
+
+.checkout-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--green),var(--cyan));color:#fff;border:none;border-radius:14px;font-family:'Nunito',sans-serif;font-size:0.9rem;font-weight:900;letter-spacing:0.04em;cursor:pointer;box-shadow:0 4px 16px rgba(16,185,129,0.3);transition:transform 0.12s,box-shadow 0.12s;margin-top:8px;}
+.checkout-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(16,185,129,0.4);}
+.checkout-btn:active{transform:scale(0.97);}
+.checkout-btn:disabled{opacity:0.38;cursor:not-allowed;box-shadow:none;transform:none;}
+.clear-cart-btn{width:100%;padding:9px;background:none;border:1.5px solid var(--border);border-radius:12px;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:700;color:var(--muted);cursor:pointer;margin-top:6px;transition:border-color 0.2s,color 0.2s;}
+.clear-cart-btn:hover{border-color:var(--red);color:var(--red);}
+
+/* ── Sales ── */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.stat-box{background:linear-gradient(135deg,#fff,var(--purple3));border:2px solid var(--border);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;}
+.stat-label{font-size:0.67rem;color:var(--muted);letter-spacing:0.06em;font-weight:700;text-transform:uppercase;}
+.stat-value{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.3rem;color:var(--purple);}
+.stat-value.green{color:var(--green);}
+.product-sales-list{display:flex;flex-direction:column;gap:6px;}
+.product-sales-row{display:flex;align-items:center;gap:8px;padding:7px 11px;background:var(--bg2);border:1.5px solid var(--border);border-radius:12px;font-size:0.8rem;}
+.ps-name{flex:1;color:var(--text);font-weight:600;}
+.ps-bar-wrap{width:70px;height:6px;background:rgba(168,85,247,0.1);border-radius:3px;overflow:hidden;}
+.ps-bar{height:100%;background:linear-gradient(90deg,var(--pink),var(--purple));border-radius:3px;}
+.ps-count{font-family:'Nunito',sans-serif;font-weight:900;color:var(--purple);font-size:0.9rem;min-width:28px;text-align:right;}
+.ps-revenue{color:var(--muted);font-size:0.74rem;min-width:60px;text-align:right;font-weight:600;}
+.reset-stats-btn{align-self:flex-end;padding:7px 16px;background:rgba(244,63,94,0.07);border:1.5px solid rgba(244,63,94,0.25);border-radius:10px;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.74rem;color:var(--red);cursor:pointer;transition:background 0.15s;}
+.reset-stats-btn:hover{background:rgba(244,63,94,0.15);}
+
+.receipt-list{display:flex;flex-direction:column;gap:7px;max-height:320px;overflow-y:auto;}
+.receipt-list::-webkit-scrollbar{width:4px;}
+.receipt-list::-webkit-scrollbar-thumb{background:var(--pink2);border-radius:2px;}
+.receipt-row{background:var(--bg2);border:1.5px solid var(--border);border-radius:14px;padding:9px 12px;display:flex;flex-direction:column;gap:4px;font-size:0.78rem;cursor:pointer;transition:border-color 0.15s,transform 0.1s;}
+.receipt-row:hover{border-color:var(--pink);transform:translateX(2px);}
+.receipt-top{display:flex;align-items:baseline;gap:8px;}
+.receipt-time{font-size:0.62rem;color:var(--muted);font-weight:700;}
+.receipt-total{font-family:'Nunito',sans-serif;font-weight:900;color:var(--pink);margin-left:auto;font-size:0.88rem;}
+.receipt-items-preview{color:var(--muted);font-size:0.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.receipt-kuji-badge{font-size:0.65rem;padding:2px 8px;background:rgba(16,185,129,0.1);border:1.5px solid rgba(16,185,129,0.3);border-radius:8px;color:var(--green);font-weight:700;}
+
+/* ── Lottery ── */
+.lottery-stage{width:100%;max-width:440px;display:flex;flex-direction:column;align-items:center;gap:14px;}
+.lottery-frame{width:100%;background:var(--card);border:2px solid var(--purple2);border-radius:24px;padding:24px 20px 20px;box-shadow:0 6px 30px rgba(168,85,247,0.15);display:flex;flex-direction:column;align-items:center;gap:14px;position:relative;overflow:hidden;}
+.lottery-frame::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--pink),var(--purple),var(--cyan));border-radius:24px 24px 0 0;}
+.lottery-ticket-count{font-size:0.7rem;color:var(--muted);text-align:center;font-weight:700;letter-spacing:0.05em;}
+.lottery-ticket-num{font-family:'Nunito',sans-serif;font-weight:900;font-size:2.2rem;color:var(--purple);display:block;line-height:1.1;}
+.lottery-box-wrap{cursor:pointer;}
+.lottery-box{width:150px;height:150px;border-radius:20px;background:linear-gradient(135deg,var(--purple3),var(--pink3));border:3px solid var(--purple2);box-shadow:0 6px 24px rgba(168,85,247,0.2),inset 0 2px 0 rgba(255,255,255,0.7);display:flex;align-items:center;justify-content:center;font-size:3.4rem;position:relative;transition:transform 0.12s;}
+.lottery-box:active{transform:scale(0.93);}
+.lottery-box.drawing{animation:boxShake 0.44s ease-in-out;}
+@keyframes boxShake{0%{transform:rotate(0)}20%{transform:rotate(-7deg) scale(1.05)}40%{transform:rotate(7deg) scale(1.06)}60%{transform:rotate(-5deg) scale(1.05)}80%{transform:rotate(4deg) scale(1.03)}100%{transform:rotate(0)}}
+.lottery-box-hint{font-size:0.6rem;color:var(--muted);letter-spacing:0.15em;margin-top:5px;text-align:center;font-weight:700;}
+.draw-mode-row{display:flex;align-items:center;gap:7px;width:100%;}
+.draw-mode-label{font-size:0.72rem;color:var(--muted);white-space:nowrap;font-weight:700;}
+.draw-mode-select{flex:1;padding:8px 26px 8px 11px;border:2px solid var(--border);border-radius:12px;background:#fff;font-family:'Nunito Sans',sans-serif;font-size:0.84rem;color:var(--text);outline:none;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23a78bbd' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;}
+.draw-btn{padding:9px 16px;background:linear-gradient(135deg,var(--purple),var(--pink));color:#fff;border:none;border-radius:12px;font-family:'Nunito',sans-serif;font-weight:800;font-size:0.78rem;cursor:pointer;flex-shrink:0;box-shadow:0 3px 12px rgba(168,85,247,0.3);transition:transform 0.12s,box-shadow 0.12s;}
+.draw-btn:hover{transform:translateY(-1px);box-shadow:0 5px 16px rgba(168,85,247,0.4);}
+.draw-btn:disabled{opacity:0.35;cursor:not-allowed;box-shadow:none;transform:none;}
+.lot-rem-bar-wrap{width:100%;display:flex;flex-direction:column;gap:4px;}
+.lot-rem-row{display:flex;justify-content:space-between;align-items:baseline;}
+.lot-rem-label{font-size:0.67rem;color:var(--muted);font-weight:700;}
+.lot-rem-num{font-family:'Nunito',sans-serif;font-weight:900;font-size:0.9rem;color:var(--purple);}
+.lot-rem-bar{width:100%;height:7px;background:var(--purple3);border-radius:4px;overflow:hidden;}
+.lot-rem-fill{height:100%;background:linear-gradient(90deg,var(--pink),var(--purple));border-radius:4px;transition:width 0.4s ease;}
+.lot-result-list{width:100%;display:flex;flex-direction:column;gap:6px;}
+.lot-result-card{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:14px;border:2px solid;font-size:0.82rem;animation:slideIn 0.22s ease both;}
+@keyframes slideIn{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
+.lot-result-card.win{background:rgba(16,185,129,0.07);border-color:rgba(16,185,129,0.35);}
+.lot-result-card.lose{background:var(--bg2);border-color:var(--border);}
+.lot-result-icon{font-size:1.3rem;flex-shrink:0;}
+.lot-result-label{flex:1;font-weight:800;}
+.lot-result-label.win{color:var(--green);}
+.lot-result-label.lose{color:var(--muted);}
+.lot-result-time{font-size:0.6rem;color:var(--muted);font-weight:700;}
+
+/* ── Gacha ── */
+.machine-frame{width:100%;max-width:420px;background:var(--card);border:2px solid var(--pink2);border-radius:24px;padding:26px 22px 22px;box-shadow:0 6px 30px rgba(255,110,180,0.15);display:flex;flex-direction:column;align-items:center;gap:16px;position:relative;overflow:hidden;}
+.machine-frame::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--yellow),var(--pink),var(--purple));border-radius:24px 24px 0 0;}
+.capsule-wrap{position:relative;width:165px;height:165px;cursor:pointer;margin-bottom:8px;}
+.capsule{
+  width:165px;height:165px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#fff,var(--pink3) 45%,var(--purple3) 80%);
+  border:3px solid var(--pink);
+  box-shadow:0 6px 28px rgba(255,110,180,0.3),inset 0 4px 12px rgba(255,255,255,0.8);
+  display:flex;align-items:center;justify-content:center;font-size:4rem;
+  position:relative;overflow:hidden;transition:transform 0.12s;
+  animation:capsuleFloat 2.5s ease-in-out infinite;
+}
+@keyframes capsuleFloat{0%,100%{box-shadow:0 6px 28px rgba(255,110,180,0.3),inset 0 4px 12px rgba(255,255,255,0.8)}50%{box-shadow:0 10px 36px rgba(255,110,180,0.45),inset 0 4px 12px rgba(255,255,255,0.8);transform:translateY(-4px)}}
+.capsule::before{content:'';position:absolute;top:8%;left:16%;width:38%;height:26%;background:rgba(255,255,255,0.55);border-radius:50%;transform:rotate(-20deg);pointer-events:none;}
+.capsule:active{transform:scale(0.93)!important;}
+.capsule.rolling{animation:capsuleRoll 0.65s ease-in-out;}
+@keyframes capsuleRoll{0%{transform:rotate(0) scale(1)}20%{transform:rotate(-14deg) scale(1.07)}40%{transform:rotate(16deg) scale(1.09)}60%{transform:rotate(-11deg) scale(1.07)}80%{transform:rotate(9deg) scale(1.04)}100%{transform:rotate(0) scale(1)}}
+.capsule-hint{position:absolute;bottom:-22px;left:50%;transform:translateX(-50%);font-size:0.58rem;color:var(--muted);letter-spacing:0.2em;white-space:nowrap;font-weight:700;}
+.remaining-bar-wrap{width:100%;display:flex;flex-direction:column;gap:4px;}
+.remaining-label-row{display:flex;justify-content:space-between;align-items:baseline;}
+.remaining-label{font-size:0.67rem;color:var(--muted);font-weight:700;}
+.remaining-num{font-family:'Nunito',sans-serif;font-weight:900;font-size:0.95rem;color:var(--pink);}
+.remaining-bar{width:100%;height:7px;background:var(--pink3);border-radius:4px;overflow:hidden;}
+.remaining-fill{height:100%;background:linear-gradient(90deg,var(--yellow),var(--pink));border-radius:4px;transition:width 0.5s ease;}
+.pull-count-row{display:flex;align-items:center;gap:8px;width:100%;}
+.pull-count-label{font-size:0.7rem;color:var(--muted);white-space:nowrap;font-weight:700;}
+.count-select{flex:1;padding:8px 26px 8px 11px;border:2px solid var(--border);border-radius:12px;background:#fff;font-family:'Nunito Sans',sans-serif;font-size:0.86rem;color:var(--text);outline:none;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23a78bbd' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;}
+.pull-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--yellow),var(--pink));color:#fff;border:none;border-radius:14px;font-family:'Nunito',sans-serif;font-weight:900;font-size:0.9rem;letter-spacing:0.05em;cursor:pointer;box-shadow:0 4px 18px rgba(255,110,180,0.35);transition:transform 0.12s,box-shadow 0.12s;position:relative;overflow:hidden;}
+.pull-btn:hover{transform:translateY(-1px);box-shadow:0 6px 22px rgba(255,110,180,0.45);}
+.pull-btn:active{transform:scale(0.97);}
+.pull-btn:disabled{opacity:0.38;cursor:not-allowed;box-shadow:none;transform:none;}
+.stock-list{width:100%;max-width:420px;display:flex;flex-direction:column;gap:6px;}
+.stock-item-row{display:flex;align-items:center;gap:8px;padding:7px 11px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;font-size:0.79rem;transition:opacity 0.3s;}
+.stock-item-img{width:30px;height:30px;border-radius:50%;object-fit:cover;border:2px solid var(--pink2);flex-shrink:0;}
+.stock-item-ph{width:30px;height:30px;border-radius:50%;background:var(--pink3);border:2px solid var(--pink2);display:flex;align-items:center;justify-content:center;font-size:0.95rem;flex-shrink:0;}
+.stock-item-name{flex:1;color:var(--text);font-weight:600;}
+.stock-item-bar{width:48px;height:5px;background:var(--pink3);border-radius:3px;overflow:hidden;}
+.stock-item-fill{height:100%;background:linear-gradient(90deg,var(--yellow),var(--pink));border-radius:3px;transition:width 0.5s ease;}
+.stock-item-count{font-family:'Nunito',sans-serif;font-weight:900;color:var(--pink);font-size:0.9rem;min-width:22px;text-align:right;}
+.stock-zero{opacity:0.3;}
+
+/* ── Setup ── */
+.item-row-header{display:grid;grid-template-columns:56px 1fr 72px 30px;gap:6px;font-size:0.65rem;color:var(--muted);margin-bottom:4px;padding:0 2px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;}
+.items-list{display:flex;flex-direction:column;gap:9px;}
+.item-row{display:grid;grid-template-columns:56px 1fr 72px 30px;gap:6px;align-items:center;}
+.img-upload-cell{position:relative;width:56px;height:56px;}
+.img-preview{width:56px;height:56px;border-radius:14px;border:2px solid var(--pink2);background:var(--pink3);object-fit:cover;display:block;cursor:pointer;transition:border-color 0.2s;}
+.img-preview:hover{border-color:var(--pink);}
+.img-upload-badge{position:absolute;bottom:-3px;right:-3px;width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,var(--pink),var(--purple));border:2px solid #fff;color:#fff;font-size:0.65rem;font-weight:900;display:flex;align-items:center;justify-content:center;pointer-events:none;}
+.img-file-input{display:none;}
+.img-placeholder{width:56px;height:56px;border-radius:14px;border:2px dashed var(--pink2);background:var(--pink3);display:flex;align-items:center;justify-content:center;font-size:1.4rem;cursor:pointer;transition:border-color 0.2s,background 0.2s;}
+.img-placeholder:hover{border-color:var(--pink);background:rgba(255,110,180,0.12);}
+.stock-summary{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg2);border:2px solid var(--border);border-radius:14px;font-size:0.8rem;color:var(--muted);}
+.num-display{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem;color:var(--purple);}
+.reg-product-row{display:grid;grid-template-columns:1fr 88px 30px;gap:6px;align-items:center;}
+.reg-product-row-header{display:grid;grid-template-columns:1fr 88px 30px;gap:6px;font-size:0.65rem;color:var(--muted);margin-bottom:3px;padding:0 2px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;}
+.kuji-type-header{display:grid;grid-template-columns:1fr 72px 72px 30px;gap:6px;font-size:0.65rem;color:var(--muted);margin-bottom:3px;padding:0 2px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;}
+.kuji-type-row{display:grid;grid-template-columns:1fr 72px 72px 30px;gap:6px;align-items:center;}
+.kuji-setting-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.kuji-setting-row label{font-size:0.76rem;color:var(--muted);font-weight:700;}
+
+/* ── Overlays ── */
+@keyframes popupIn{from{opacity:0;transform:scale(0.7) translateY(18px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes emojiPop{from{opacity:0;transform:scale(0.2) rotate(-25deg)}to{opacity:1;transform:scale(1) rotate(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes popIn{from{opacity:0;transform:scale(0.4) rotate(-12deg)}to{opacity:1;transform:scale(1) rotate(0)}}
+
+.overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(59,31,78,0.5);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:14px;}
+.overlay.active{display:flex;}
+
+.result-popup{background:#fff;border:3px solid var(--pink2);border-radius:24px;padding:30px 26px 22px;max-width:330px;width:100%;box-shadow:0 16px 50px rgba(255,110,180,0.2);display:flex;flex-direction:column;align-items:center;gap:13px;text-align:center;position:relative;animation:popupIn 0.38s cubic-bezier(0.34,1.56,0.64,1);}
+.result-popup::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--yellow),var(--pink),var(--purple));border-radius:24px 24px 0 0;}
+.result-img-wrap{width:120px;height:120px;border-radius:50%;border:3px solid var(--pink2);box-shadow:0 6px 20px rgba(255,110,180,0.25);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:4rem;background:var(--pink3);animation:emojiPop 0.48s 0.08s cubic-bezier(0.34,1.56,0.64,1) both;}
+.result-img-wrap img{width:100%;height:100%;object-fit:cover;}
+.result-name{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.25rem;color:var(--purple);animation:fadeUp 0.38s 0.26s ease both;}
+.result-meta{font-size:0.72rem;color:var(--muted);font-weight:700;animation:fadeUp 0.38s 0.36s ease both;}
+.result-close{padding:9px 30px;background:var(--bg2);border:2px solid var(--border);border-radius:14px;font-family:'Nunito',sans-serif;font-weight:800;font-size:0.78rem;color:var(--muted);cursor:pointer;transition:border-color 0.2s,color 0.2s;animation:fadeUp 0.38s 0.44s ease both;}
+.result-close:hover{border-color:var(--pink);color:var(--pink);}
+.multi-result-popup{background:#fff;border:3px solid var(--pink2);border-radius:24px;padding:20px 16px 18px;max-width:640px;width:100%;max-height:86vh;overflow-y:auto;box-shadow:0 16px 50px rgba(255,110,180,0.2);display:flex;flex-direction:column;align-items:center;gap:13px;text-align:center;position:relative;animation:popupIn 0.38s cubic-bezier(0.34,1.56,0.64,1);}
+.multi-result-popup::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--yellow),var(--pink),var(--purple));border-radius:24px 24px 0 0;}
+.multi-result-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:1rem;color:var(--purple);}
+.multi-badges-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:9px;width:100%;}
+.multi-badge-card{background:var(--bg2);border:2px solid var(--border);border-radius:16px;padding:12px 8px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;animation:popIn 0.32s cubic-bezier(0.34,1.56,0.64,1) both;}
+.multi-badge-img{width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid var(--pink2);}
+.multi-badge-ph{width:52px;height:52px;border-radius:50%;background:var(--pink3);border:2px solid var(--pink2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;}
+.multi-badge-name{font-size:0.67rem;color:var(--text);line-height:1.3;font-weight:600;}
+
+.checkout-popup{background:#fff;border:3px solid var(--green2);border-radius:24px;padding:26px 22px 20px;max-width:380px;width:100%;box-shadow:0 16px 50px rgba(16,185,129,0.15);display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;position:relative;animation:popupIn 0.38s cubic-bezier(0.34,1.56,0.64,1);}
+.checkout-popup::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--green),var(--cyan));border-radius:24px 24px 0 0;}
+.co-receipt{width:100%;background:var(--bg2);border:1.5px solid var(--border);border-radius:14px;padding:13px;text-align:left;font-size:0.78rem;}
+.co-receipt-row{display:flex;justify-content:space-between;padding:3px 0;color:var(--text);font-weight:600;}
+.co-receipt-row.total{font-family:'Nunito',sans-serif;font-weight:900;font-size:1rem;color:var(--pink);border-top:1.5px dashed var(--border);margin-top:5px;padding-top:7px;}
+.co-receipt-row.paid{color:var(--green);font-weight:700;}
+.co-receipt-row.change{font-family:'Nunito',sans-serif;font-weight:900;color:var(--green);font-size:1.1rem;}
+.co-kuji-line{font-size:0.9rem;color:var(--text);font-weight:700;}
+.co-kuji-num{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.4rem;color:var(--green);}
+.goto-lot-btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--green),var(--cyan));color:#fff;border:none;border-radius:14px;font-family:'Nunito',sans-serif;font-weight:900;font-size:0.84rem;letter-spacing:0.04em;cursor:pointer;box-shadow:0 4px 16px rgba(16,185,129,0.3);transition:transform 0.12s;}
+.goto-lot-btn:active{transform:scale(0.97);}
+.close-co-btn{padding:9px 26px;background:var(--bg2);border:2px solid var(--border);border-radius:14px;font-family:'Nunito',sans-serif;font-weight:800;font-size:0.78rem;color:var(--muted);cursor:pointer;transition:border-color 0.2s,color 0.2s;}
+.close-co-btn:hover{border-color:var(--pink);color:var(--pink);}
+
+.lot-result-popup{background:#fff;border-radius:24px;padding:32px 26px 22px;max-width:330px;width:100%;display:flex;flex-direction:column;align-items:center;gap:13px;text-align:center;position:relative;animation:popupIn 0.34s cubic-bezier(0.34,1.56,0.64,1);}
+.lot-result-popup::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;border-radius:24px 24px 0 0;}
+.lot-result-popup.win-popup{border:3px solid var(--green2);box-shadow:0 16px 50px rgba(16,185,129,0.2);}
+.lot-result-popup.win-popup::before{background:linear-gradient(90deg,var(--green),var(--cyan));}
+.lot-result-popup.lose-popup{border:3px solid var(--border);box-shadow:0 12px 40px rgba(59,31,78,0.1);}
+.lot-result-popup.lose-popup::before{background:linear-gradient(90deg,var(--border),var(--purple2));}
+.lot-big-icon{font-size:4.5rem;animation:emojiPop 0.42s 0.05s cubic-bezier(0.34,1.56,0.64,1) both;}
+.lot-big-label{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.8rem;letter-spacing:0.04em;animation:fadeUp 0.38s 0.2s ease both;}
+.lot-big-label.win{color:var(--green);}
+.lot-big-label.lose{color:var(--muted);}
+.lot-big-sub{font-size:0.74rem;color:var(--muted);font-weight:700;animation:fadeUp 0.38s 0.3s ease both;}
+.lot-close-btn{padding:9px 30px;background:var(--bg2);border:2px solid var(--border);border-radius:14px;font-family:'Nunito',sans-serif;font-weight:800;font-size:0.78rem;color:var(--muted);cursor:pointer;transition:border-color 0.2s,color 0.2s;animation:fadeUp 0.38s 0.38s ease both;}
+.lot-close-btn:hover{border-color:var(--purple);color:var(--purple);}
+.multi-lot-popup{background:#fff;border:3px solid var(--purple2);border-radius:24px;padding:20px 16px 18px;max-width:480px;width:100%;max-height:86vh;overflow-y:auto;box-shadow:0 16px 50px rgba(168,85,247,0.15);display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;position:relative;animation:popupIn 0.38s cubic-bezier(0.34,1.56,0.64,1);}
+.multi-lot-popup::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--pink),var(--purple));border-radius:24px 24px 0 0;}
+.multi-lot-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:1rem;color:var(--purple);}
+.multi-lot-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(95px,1fr));gap:8px;width:100%;}
+.multi-lot-card{border-radius:16px;padding:12px 8px 10px;display:flex;flex-direction:column;align-items:center;gap:5px;border:2px solid;animation:popIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both;}
+.multi-lot-card.win{background:rgba(16,185,129,0.07);border-color:rgba(16,185,129,0.35);}
+.multi-lot-card.lose{background:var(--bg2);border-color:var(--border);}
+.multi-lot-card-icon{font-size:1.8rem;}
+.multi-lot-card-label{font-family:'Nunito',sans-serif;font-weight:900;font-size:0.78rem;}
+.multi-lot-card-label.win{color:var(--green);}
+.multi-lot-card-label.lose{color:var(--muted);}
+
+#confetti-canvas{position:fixed;inset:0;pointer-events:none;z-index:199;}
+
+.history-grid{width:100%;display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:9px;}
+.history-card{background:var(--card);border:2px solid var(--border);border-radius:16px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:0 3px 12px var(--shadow);animation:fadeUp 0.28s ease both;}
+.h-img{width:46px;height:46px;border-radius:50%;object-fit:cover;border:2px solid var(--pink2);}
+.h-ph{width:46px;height:46px;border-radius:50%;background:var(--pink3);border:2px solid var(--pink2);display:flex;align-items:center;justify-content:center;font-size:1.3rem;}
+.h-name{font-size:0.7rem;color:var(--text);text-align:center;line-height:1.3;font-weight:600;}
+.h-time{font-size:0.58rem;color:var(--muted);font-weight:700;}
+.empty-msg{color:var(--muted);font-size:0.78rem;padding:30px 0;text-align:center;grid-column:1/-1;font-weight:700;}
+.reset-btn{padding:7px 18px;background:rgba(244,63,94,0.07);border:1.5px solid rgba(244,63,94,0.25);border-radius:12px;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.72rem;color:var(--red);cursor:pointer;transition:background 0.15s;align-self:flex-end;}
+.reset-btn:hover{background:rgba(244,63,94,0.15);}
+
+/* ═══════════════════════════════════════
+   THEME VARIABLES
+═══════════════════════════════════════ */
+
+/* default = fancy (pastel) — already set in :root above */
+
+/* ── NEON ── */
+[data-theme="neon"]{
+  --bg:#080b14;--bg2:#0d1220;--card:#0f1628;--card2:#131d35;
+  --pink:#00f0ff;--pink2:#0090aa;--pink3:rgba(0,240,255,0.08);
+  --purple:#bf00ff;--purple2:#7700bb;--purple3:rgba(191,0,255,0.08);
+  --cyan:#ff00aa;--cyan2:#aa0077;
+  --yellow:#ffe600;--yellow2:rgba(255,230,0,0.12);
+  --green:#00ffb3;--green2:#00aa77;
+  --red:#ff3a5c;--text:#e8f0ff;--muted:#5a6a8a;
+  --border:rgba(0,240,255,0.18);--shadow:rgba(0,240,255,0.1);
+  --font-head:'Orbitron',monospace;--font-body:'DM Mono','Noto Sans JP',monospace;
+  --radius-card:6px;--radius-btn:4px;--radius-input:4px;--radius-tab:4px;
+  --tab-padding:4px;--border-w:1px;
+  --grad-main:linear-gradient(135deg,#00f0ff,#bf00ff);
+  --grad-green:linear-gradient(135deg,#00ffb3,#00f0ff);
+  --grad-accent:linear-gradient(135deg,#ffe600,#ff00aa);
+  --card-before:linear-gradient(90deg,transparent,#00f0ff,transparent);
+  --glow-pink:0 0 14px rgba(0,240,255,0.6),0 0 32px rgba(0,240,255,0.2);
+  --glow-green:0 0 14px rgba(0,255,179,0.5);
+  --capsule-bg:radial-gradient(circle at 35% 30%,rgba(0,240,255,0.25),rgba(191,0,255,0.2) 50%,rgba(8,11,20,0.95));
+  --capsule-border:#00f0ff;--capsule-glow:0 6px 28px rgba(0,240,255,0.4),inset 0 4px 12px rgba(0,240,255,0.1);
+  --capsule-anim:capsuleNeonPulse;
+}
+
+/* ── WABI (和風) ── */
+[data-theme="wabi"]{
+  --bg:#f7f2ea;--bg2:#f0e8d8;--card:#fffdf7;--card2:#faf6ed;
+  --pink:#8b3a1a;--pink2:#c4855a;--pink3:#f5e6d8;
+  --purple:#5a3825;--purple2:#9c7050;--purple3:#ede0cc;
+  --cyan:#2d6a4f;--cyan2:#74b49b;
+  --yellow:#c8a84b;--yellow2:#f0dea0;
+  --green:#2d6a4f;--green2:#74b49b;
+  --red:#8b1a1a;--text:#2c1a0e;--muted:#8a7060;
+  --border:rgba(139,58,26,0.2);--shadow:rgba(89,40,10,0.1);
+  --font-head:'Zen Kaku Gothic New','Noto Sans JP',serif;--font-body:'Noto Sans JP',serif;
+  --radius-card:4px;--radius-btn:2px;--radius-input:2px;--radius-tab:2px;
+  --tab-padding:3px;--border-w:1.5px;
+  --grad-main:linear-gradient(135deg,#8b3a1a,#c4855a);
+  --grad-green:linear-gradient(135deg,#2d6a4f,#74b49b);
+  --grad-accent:linear-gradient(135deg,#c8a84b,#8b3a1a);
+  --card-before:linear-gradient(90deg,transparent,#c8a84b,transparent);
+  --glow-pink:0 2px 8px rgba(139,58,26,0.25);
+  --glow-green:0 2px 8px rgba(45,106,79,0.25);
+  --capsule-bg:radial-gradient(circle at 38% 38%,#f5f0e8,#d4c9a8 55%,#b8a880);
+  --capsule-border:#c8a84b;--capsule-glow:0 4px 20px rgba(139,58,26,0.2),inset 0 6px 16px rgba(255,255,255,0.4);
+  --capsule-anim:capsuleWabi;
+}
+
+/* ── MONO ── */
+[data-theme="mono"]{
+  --bg:#f8f8f8;--bg2:#efefef;--card:#ffffff;--card2:#f9f9f9;
+  --pink:#111111;--pink2:#444444;--pink3:#e8e8e8;
+  --purple:#222222;--purple2:#666666;--purple3:#f0f0f0;
+  --cyan:#333333;--cyan2:#888888;
+  --yellow:#111111;--yellow2:#dddddd;
+  --green:#111111;--green2:#555555;
+  --red:#ff2222;--text:#111111;--muted:#888888;
+  --border:rgba(0,0,0,0.12);--shadow:rgba(0,0,0,0.08);
+  --font-head:'DM Mono',monospace;--font-body:'DM Mono','Noto Sans JP',monospace;
+  --radius-card:0px;--radius-btn:0px;--radius-input:2px;--radius-tab:0px;
+  --tab-padding:3px;--border-w:2px;
+  --grad-main:linear-gradient(135deg,#111,#555);
+  --grad-green:linear-gradient(135deg,#222,#666);
+  --grad-accent:linear-gradient(135deg,#333,#111);
+  --card-before:linear-gradient(90deg,transparent,#111,transparent);
+  --glow-pink:0 2px 0 #111;
+  --glow-green:0 2px 0 #111;
+  --capsule-bg:radial-gradient(circle at 38% 38%,#fff,#ccc 55%,#aaa);
+  --capsule-border:#111;--capsule-glow:0 4px 16px rgba(0,0,0,0.2),inset 0 6px 12px rgba(255,255,255,0.5);
+  --capsule-anim:capsuleFloat;
+}
+
+/* ── Theme-aware overrides ── */
+[data-theme="neon"] body{background:var(--bg);}
+[data-theme="neon"] body::before{background:radial-gradient(ellipse at 20% 10%,rgba(0,240,255,0.08) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(191,0,255,0.08) 0%,transparent 50%);}
+[data-theme="neon"] body::after{content:'';background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.025) 2px,rgba(0,0,0,0.025) 4px);}
+[data-theme="wabi"] body::before{background:radial-gradient(ellipse at 20% 0%,rgba(200,168,75,0.1) 0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(45,106,79,0.08) 0%,transparent 40%);}
+[data-theme="wabi"] body::after{content:'';}
+[data-theme="mono"] body::before{background:none;}
+[data-theme="mono"] body::after{content:'';}
+
+/* font-head/font-body via var() on elements */
+[data-theme] h1,[data-theme] .header-deco,[data-theme] .card h2,[data-theme] .tab-btn,
+[data-theme] .pull-btn,[data-theme] .checkout-btn,[data-theme] .draw-btn,
+[data-theme] .cart-total-amount,[data-theme] .stat-value,[data-theme] .remaining-num,
+[data-theme] .lot-big-label,[data-theme] .result-name,[data-theme] .multi-result-title,
+[data-theme] .multi-lot-title,[data-theme] .co-kuji-num,[data-theme] .lottery-ticket-num,
+[data-theme] .kuji-times-big,[data-theme] .change-amount,[data-theme] .prod-price,
+[data-theme] .ps-count,[data-theme] .stock-item-count,[data-theme] .receipt-total,
+[data-theme] .num-display,[data-theme] .lot-rem-num,[data-theme] .co-receipt-row.total,
+[data-theme] .co-receipt-row.change,[data-theme] .lot-result-label{
+  font-family:var(--font-head);
+}
+[data-theme] body,[data-theme] .txt-input,[data-theme] .num-input,
+[data-theme] .prod-name,[data-theme] .cart-item-name,[data-theme] .ps-name,
+[data-theme] .h-name,[data-theme] .receipt-items-preview,[data-theme] .co-receipt-row{
+  font-family:var(--font-body);
+}
+
+/* card top line */
+[data-theme] .card::before{background:var(--card-before);}
+[data-theme] .card{border-radius:var(--radius-card);border-width:var(--border-w);}
+[data-theme] .tabs{border-radius:calc(var(--radius-card) + 14px);border-width:var(--border-w);}
+[data-theme] .tab-btn{border-radius:var(--radius-tab);}
+[data-theme] .txt-input,[data-theme] .num-input{border-radius:var(--radius-input);border-width:var(--border-w);}
+[data-theme] .pull-btn,[data-theme] .checkout-btn,[data-theme] .draw-btn,
+[data-theme] .manual-add-btn,[data-theme] .goto-lot-btn{border-radius:var(--radius-btn);}
+[data-theme] .prod-btn{border-radius:calc(var(--radius-btn) + 6px);}
+[data-theme] .result-popup,[data-theme] .multi-result-popup,[data-theme] .checkout-popup,
+[data-theme] .lot-result-popup,[data-theme] .multi-lot-popup{border-radius:calc(var(--radius-card) + 6px);}
+[data-theme] .lottery-frame,[data-theme] .machine-frame{border-radius:calc(var(--radius-card) + 8px);}
+
+/* gradient buttons */
+[data-theme] .pull-btn{background:var(--grad-accent);box-shadow:var(--glow-pink);}
+[data-theme] .checkout-btn{background:var(--grad-green);box-shadow:var(--glow-green);}
+[data-theme] .draw-btn{background:var(--grad-main);}
+[data-theme] .manual-add-btn{background:var(--grad-main);border:none;}
+[data-theme] .goto-lot-btn{background:var(--grad-green);}
+[data-theme] .tab-btn.active{background:var(--grad-main);box-shadow:none;}
+
+/* header gradient */
+[data-theme] h1{background:var(--grad-main);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+
+/* capsule */
+[data-theme] .capsule{background:var(--capsule-bg);border-color:var(--capsule-border);box-shadow:var(--capsule-glow);animation-name:var(--capsule-anim);}
+
+/* wabi special accents */
+[data-theme="wabi"] .card h2{letter-spacing:0.15em;}
+
+[data-theme="wabi"] .tabs{padding:2px;}
+[data-theme="wabi"] .lottery-frame::before,[data-theme="wabi"] .machine-frame::before,[data-theme="wabi"] .result-popup::before,[data-theme="wabi"] .multi-result-popup::before,[data-theme="wabi"] .checkout-popup::before,[data-theme="wabi"] .lot-result-popup::before,[data-theme="wabi"] .multi-lot-popup::before{background:linear-gradient(90deg,transparent,var(--yellow),transparent);}
+
+/* neon glows */
+[data-theme="neon"] .card{background:var(--card);box-shadow:0 0 20px rgba(0,0,0,0.4),inset 0 1px 0 rgba(0,240,255,0.05);}
+[data-theme="neon"] .remaining-fill{box-shadow:0 0 6px var(--pink);}
+[data-theme="neon"] .lot-rem-fill{box-shadow:0 0 6px var(--purple);}
+[data-theme="neon"] .tab-btn{color:var(--muted);}
+[data-theme="neon"] .tab-btn.active{color:#fff;}
+[data-theme="neon"] .overlay{background:rgba(0,0,0,0.88);}
+
+/* mono special */
+[data-theme="mono"] .card::before{opacity:0.4;}
+[data-theme="mono"] .tabs{background:var(--card);}
+[data-theme="mono"] .tab-btn.active{color:#fff;}
+[data-theme="mono"] h1{font-size:clamp(1rem,4vw,1.6rem);letter-spacing:0.02em;}
+[data-theme="mono"] .prod-btn{background:var(--card);}
+[data-theme="mono"] .result-popup::before,[data-theme="mono"] .multi-result-popup::before,
+[data-theme="mono"] .checkout-popup::before,[data-theme="mono"] .lot-result-popup::before,
+[data-theme="mono"] .multi-lot-popup::before{background:linear-gradient(90deg,transparent,#111,transparent);}
+
+@keyframes capsuleNeonPulse{
+  0%,100%{box-shadow:0 6px 28px rgba(0,240,255,0.3),inset 0 4px 12px rgba(0,240,255,0.1);}
+  50%{box-shadow:0 8px 40px rgba(0,240,255,0.7),0 0 60px rgba(0,240,255,0.15),inset 0 4px 12px rgba(0,240,255,0.15);}
+}
+@keyframes capsuleWabi{
+  0%,100%{transform:translateY(0);box-shadow:var(--capsule-glow);}
+  50%{transform:translateY(-3px);box-shadow:0 8px 28px rgba(139,58,26,0.28),inset 0 6px 16px rgba(255,255,255,0.45);}
+}
+
+/* ── Theme switcher UI ── */
+
+/* ── Logo ── */
+.logo-wrap{text-align:center;padding:4px 0;}
+
+/* ── PDF export button ── */
+.pdf-export-btn{
+  width:100%;padding:12px;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  color:#fff;border:none;border-radius:var(--radius-btn,12px);
+  font-family:var(--font-head,'Nunito',sans-serif);font-weight:700;
+  font-size:0.88rem;letter-spacing:0.06em;cursor:pointer;
+  box-shadow:0 4px 14px var(--shadow);transition:transform 0.12s,box-shadow 0.12s;
+}
+.pdf-export-btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px var(--shadow);}
+.pdf-export-btn:active{transform:scale(0.97);}
+
+/* ── Print styles ── */
+@media print{
+  body *{visibility:hidden!important;}
+  #pdf-report,#pdf-report *{visibility:visible!important;}
+  #pdf-report{
+    position:fixed;inset:0;z-index:9999;
+    background:#fff;color:#111;
+    padding:28px 32px;
+    font-family:'Noto Sans JP','Helvetica Neue',sans-serif;
+    font-size:11pt;
+  }
+  @page{margin:15mm 12mm;size:A4;}
+}
+
+/* ── Product qty controls ── */
+.prod-btn{position:relative;padding-bottom:36px!important;}
+.prod-qty-row{
+  position:absolute;bottom:8px;left:8px;right:8px;
+  display:flex;align-items:center;justify-content:center;gap:0;
+  background:rgba(255,255,255,0.7);border-radius:20px;overflow:hidden;
+  border:1.5px solid var(--border);
+}
+.prod-qty-minus,.prod-qty-plus{
+  width:28px;height:26px;background:none;border:none;
+  font-size:1.1rem;font-weight:900;color:var(--purple);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:background 0.12s;line-height:1;
+  font-family:var(--font-head,'Nunito',sans-serif);
+}
+.prod-qty-minus:hover,.prod-qty-plus:hover{background:var(--pink3);}
+.prod-qty-num{
+  flex:1;text-align:center;font-family:var(--font-head,'Nunito',sans-serif);
+  font-weight:900;font-size:0.88rem;color:var(--text);
+  pointer-events:none;min-width:22px;
+}
+.prod-qty-add{
+  width:100%;margin-top:6px;padding:7px 0;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  color:#fff;border:none;border-radius:10px;
+  font-family:var(--font-head,'Nunito',sans-serif);
+  font-weight:800;font-size:0.75rem;cursor:pointer;
+  transition:opacity 0.12s,transform 0.12s;
+}
+.prod-qty-add:active{transform:scale(0.96);}
+[data-theme="neon"] .prod-qty-row{background:rgba(0,0,0,0.5);border-color:rgba(0,240,255,0.2);}
+[data-theme="neon"] .prod-qty-minus,.prod-qty-plus{color:var(--pink);}
+[data-theme="wabi"] .prod-qty-row{background:rgba(245,240,232,0.8);}
+[data-theme="mono"] .prod-qty-row{background:rgba(240,240,240,0.9);border-color:#ccc;border-radius:0;}
+[data-theme="mono"] .prod-qty-minus,[data-theme="mono"] .prod-qty-plus{color:#111;}
+.theme-switcher{display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap;justify-content:center;}
+.theme-btn{
+  padding:5px 13px;border-radius:20px;border:1.5px solid var(--border);
+  background:var(--card);font-family:var(--font-body,'Nunito Sans',sans-serif);
+  font-size:0.7rem;font-weight:700;color:var(--muted);cursor:pointer;
+  transition:all 0.2s;white-space:nowrap;
+}
+.theme-btn:hover{border-color:var(--pink);color:var(--pink);}
+.theme-btn.active{background:var(--pink);border-color:var(--pink);color:#fff;}
+[data-theme="neon"] .theme-btn.active{background:var(--pink);border-color:var(--pink);color:#000;box-shadow:0 0 10px rgba(0,240,255,0.5);}
+[data-theme="wabi"] .theme-btn.active{background:var(--pink);border-color:var(--pink);color:#fff;}
+[data-theme="mono"] .theme-btn.active{background:#111;border-color:#111;color:#fff;}
+
+</style>
+</head>
+<body>
+<canvas id="confetti-canvas"></canvas>
+
+<!-- PDF report (print only) -->
+<div id="pdf-report" style="display:none"></div>
+
+
+<!-- gacha result -->
+<div class="overlay" id="result-overlay">
+  <div class="result-popup" id="single-popup">
+    <div class="result-img-wrap" id="res-img-wrap"></div>
+    <div class="result-name" id="res-name"></div>
+    <div class="result-meta" id="res-meta"></div>
+    <button class="result-close" onclick="closeResult()">閉じる</button>
+  </div>
+  <div class="multi-result-popup" id="multi-popup" style="display:none">
+    <div class="multi-result-title" id="multi-title">✦ 結果 ✦</div>
+    <div class="multi-badges-grid" id="multi-grid"></div>
+    <button class="result-close" onclick="closeResult()">閉じる</button>
+  </div>
+</div>
+
+<!-- lot result -->
+<div class="overlay" id="lot-result-overlay">
+  <div class="lot-result-popup" id="lot-single-popup">
+    <div class="lot-big-icon" id="lot-icon"></div>
+    <div class="lot-big-label" id="lot-label"></div>
+    <div class="lot-big-sub" id="lot-sub"></div>
+    <button class="lot-close-btn" onclick="closeLotResult()">閉じる</button>
+  </div>
+  <div class="multi-lot-popup" id="lot-multi-popup" style="display:none">
+    <div class="multi-lot-title" id="lot-multi-title">✦ くじ結果 ✦</div>
+    <div class="multi-lot-grid" id="lot-multi-grid"></div>
+    <button class="lot-close-btn" onclick="closeLotResult()">閉じる</button>
+  </div>
+</div>
+
+<!-- checkout -->
+<div class="overlay" id="checkout-overlay">
+  <div class="checkout-popup">
+    <div style="font-size:2rem;animation:emojiPop 0.38s cubic-bezier(0.34,1.56,0.64,1) both"></div>
+    <div class="co-receipt" id="co-receipt"></div>
+    <div class="co-kuji-line" id="co-kuji-line" style="display:none">くじ引き <span class="co-kuji-num" id="co-times"></span> 回！</div>
+    <div class="co-kuji-line" id="co-gacha-line" style="display:none">ガチャ <span class="co-kuji-num" id="co-gacha-times" style="color:var(--green);"></span> 回！</div>
+    <button class="goto-lot-btn" id="goto-next-btn" onclick="goToNextBonus()" style="display:none">くじを引きに行く</button>
+    <button class="close-co-btn" onclick="closeCheckout()">閉じる</button>
+  </div>
+</div>
+
+<div class="app">
+  <header>
+    <div class="logo-wrap" id="logo-wrap">
+      <!-- logo rendered by JS per theme -->
+    </div>
+    <div class="header-line"></div>
+    <div class="theme-switcher" style="margin-top:10px">
+      <button class="theme-btn active" onclick="setTheme('fancy')" id="tbtn-fancy">ファンシー</button>
+      <button class="theme-btn" onclick="setTheme('neon')" id="tbtn-neon">ネオン</button>
+      <button class="theme-btn" onclick="setTheme('wabi')" id="tbtn-wabi">和風</button>
+      <button class="theme-btn" onclick="setTheme('mono')" id="tbtn-mono">モノトーン</button>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('register')">レジ</button>
+    <button class="tab-btn" onclick="switchTab('sales')">売上</button>
+    <button class="tab-btn" onclick="switchTab('lottery')">くじ</button>
+    <button class="tab-btn" onclick="switchTab('gacha')">ガチャ</button>
+    <button class="tab-btn" onclick="switchTab('setup')">設定</button>
+    <button class="tab-btn" onclick="switchTab('history')">履歴</button>
+  </div>
+
+  <!-- ══ REGISTER ══ -->
+  <div class="panel active" id="panel-register">
+    <div class="reg-main">
+      <!-- LEFT: products + manual -->
+      <div class="reg-left">
+        <div class="card">
+          <h2>商品を選ぶ</h2>
+          <div class="product-grid" id="product-grid"></div>
+        </div>
+        <div class="card">
+          <h2>手入力</h2>
+          <div class="manual-row">
+            <input class="txt-input" type="number" id="manual-amount" placeholder="金額" min="0" style="width:90px;flex-shrink:0">
+            <input class="txt-input" type="text" id="manual-name" placeholder="商品名（任意）">
+            <button class="manual-add-btn" onclick="addManual()">追加</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: cart + payment -->
+      <div class="reg-right">
+        <div class="card">
+          <h2>カート</h2>
+          <div class="cart-items" id="cart-items"><div class="cart-empty">商品を追加してください</div></div>
+          <div class="cart-total-row">
+            <span class="cart-total-label">合計</span>
+            <span class="cart-total-amount" id="cart-total">¥0</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>お支払い</h2>
+          <div class="payment-section">
+            <div class="payment-row">
+              <span class="payment-label">お預かり</span>
+              <input class="txt-input" type="number" id="paid-amount" placeholder="金額を入力" min="0" oninput="updateChange()">
+            </div>
+            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"><button class="chokiri-btn" id="chokiri-btn" onclick="setChokiri()" style="display:none">ちょうど</button><div class="payment-presets" id="payment-presets"></div></div>
+            <div class="change-display zero" id="change-display">
+              <span class="change-label">お釣り</span>
+              <span class="change-amount zero" id="change-amount">—</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>くじ</h2>
+          <div class="kuji-info-bar">
+            <span style="font-size:0.72rem;color:var(--muted);font-weight:700;">くじ</span>
+            <span class="kuji-times-big" id="kuji-times-disp">0</span>
+            <span style="font-size:0.72rem;color:var(--muted);font-weight:700;">回</span>
+            <span style="width:1.5px;height:18px;background:var(--border);margin:0 4px;border-radius:1px"></span>
+            <span style="font-size:0.72rem;color:var(--muted);font-weight:700;">ガチャ</span>
+            <span class="kuji-times-big" id="gacha-times-disp" style="color:var(--neon2);">0</span>
+            <span style="font-size:0.72rem;color:var(--muted);font-weight:700;">回</span>
+            <span style="flex:1"></span>
+            <span style="font-size:0.68rem;color:var(--muted);font-weight:700;" id="kuji-rule-disp"></span>
+          </div>
+          <button class="checkout-btn" id="checkout-btn" onclick="doCheckout()" disabled style="margin-top:10px">会計する</button>
+          <button class="clear-cart-btn" onclick="clearCart()">カートをリセット</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SALES ══ -->
+  <div class="panel" id="panel-sales">
+    <!-- summary stats -->
+    <div class="card" style="width:100%">
+      <h2>売上サマリー</h2>
+      <div class="stats-grid">
+        <div class="stat-box">
+          <span class="stat-label">総売上</span>
+          <span class="stat-value green" id="stat-total-revenue">¥0</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">取引件数</span>
+          <span class="stat-value" id="stat-tx-count">0件</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">総販売数</span>
+          <span class="stat-value" id="stat-total-items">0個</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">平均客単価</span>
+          <span class="stat-value" id="stat-avg">¥0</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:4px">
+        <button class="pdf-export-btn" style="max-width:200px" onclick="exportPDF()">PDF出力</button>
+        <button class="reset-stats-btn" onclick="resetSales()">リセット</button>
+      </div>
+    </div>
+
+    <!-- product breakdown -->
+    <div class="card" style="width:100%">
+      <h2>商品別 販売数</h2>
+      <div class="product-sales-list" id="product-sales-list">
+        <div style="color:var(--muted);font-size:0.78rem;padding:8px 0">まだ売上がありません</div>
+      </div>
+    </div>
+
+    <!-- receipt history -->
+    <div class="card" style="width:100%">
+      <h2>会計履歴</h2>
+      <div class="receipt-list" id="receipt-list">
+        <div style="color:var(--muted);font-size:0.78rem;padding:8px 0">まだ会計がありません</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ LOTTERY ══ -->
+  <div class="panel" id="panel-lottery">
+    <div class="lottery-stage">
+      <div class="lottery-frame">
+        <div class="lottery-ticket-count">残りチケット<span class="lottery-ticket-num" id="lot-ticket-num">0</span>枚</div>
+        <div class="lottery-box-wrap" onclick="doDrawOne()">
+          <div class="lottery-box" id="lottery-box">✦</div>
+          <div class="lottery-box-hint">TAP — 1枚引く</div>
+        </div>
+        <div class="lot-rem-bar-wrap">
+          <div class="lot-rem-row">
+            <span class="lot-rem-label">チケット残量</span>
+            <span class="lot-rem-num" id="lot-rem-num">0 / 0</span>
+          </div>
+          <div class="lot-rem-bar"><div class="lot-rem-fill" id="lot-rem-fill" style="width:0%"></div></div>
+        </div>
+        <div class="draw-mode-row">
+          <span class="draw-mode-label">まとめて</span>
+          <select class="draw-mode-select" id="draw-all-select"><option value="0">枚数…</option></select>
+          <button class="draw-btn" id="draw-all-btn" onclick="doDrawAll()" disabled>引く</button>
+        </div>
+      </div>
+      <div class="lot-result-list" id="lot-result-list"></div>
+    </div>
+  </div>
+
+  <!-- ══ GACHA ══ -->
+  <div class="panel" id="panel-gacha">
+    <div class="machine-frame" style="position:relative">
+      <div id="pending-gacha-badge" style="display:none;position:absolute;top:-10px;right:-10px;background:rgba(0,240,255,0.12);border:1px solid var(--neon);color:var(--paper);font-family:'Zen Antique',serif;font-size:0.9rem;width:34px;height:34px;border-radius:50%;align-items:center;justify-content:center;border:2px solid var(--paper);box-shadow:0 2px 8px rgba(139,58,26,0.35)">0</div>
+      <div class="capsule-wrap" onclick="doPull()">
+        <div class="capsule" id="capsule"><span id="capsule-inner">✦</span></div>
+        <div class="capsule-hint">TAP TO SPIN</div>
+      </div>
+      <div class="remaining-bar-wrap">
+        <div class="remaining-label-row"><span class="remaining-label">残り在庫</span><span class="remaining-num" id="remaining-num">0 個</span></div>
+        <div class="remaining-bar"><div class="remaining-fill" id="remaining-fill" style="width:100%"></div></div>
+      </div>
+      <div class="pull-count-row">
+        <span class="pull-count-label">連数</span>
+        <select class="count-select" id="count-select" onchange="pullCount=parseInt(this.value);updatePullBtn()">
+          <option value="1">1回</option><option value="2">2連</option><option value="3">3連</option>
+          <option value="4">4連</option><option value="5">5連</option><option value="6">6連</option>
+          <option value="7">7連</option><option value="8">8連</option><option value="9">9連</option>
+          <option value="10">10連</option>
+        </select>
+      </div>
+      <button class="pull-btn" id="pull-btn" onclick="doPull()">ガチャを回す</button>
+    </div>
+    <div class="stock-list" id="gacha-stock-list"></div>
+  </div>
+
+  <!-- ══ SETUP ══ -->
+  <div class="panel" id="panel-setup">
+    <div class="card">
+      <h2>缶バッジの種類と個数</h2>
+      <div class="item-row-header"><span style="text-align:center">画像</span><span>名前</span><span style="text-align:center">個数</span><span></span></div>
+      <div class="items-list" id="items-list"></div>
+      <button class="add-row-btn" onclick="addGachaItem()">＋ 種類を追加</button>
+    </div>
+    <div class="card">
+      <h2>合計在庫</h2>
+      <div class="stock-summary"><span>全体個数</span><span class="num-display" id="total-count">0</span><span>個</span><span style="flex:1"></span><span id="kinds-count" style="color:var(--muted);font-size:0.72rem"></span></div>
+      <div id="stock-warning" class="warn-text" style="display:none"></div>
+    </div>
+    <div class="card">
+      <h2>レジ商品リスト</h2>
+      <div class="reg-product-row-header"><span>商品名</span><span style="text-align:center">金額（円）</span><span></span></div>
+      <div style="display:flex;flex-direction:column;gap:6px" id="reg-products-list"></div>
+      <button class="add-row-btn" onclick="addRegProduct()" style="margin-top:7px">＋ 商品を追加</button>
+    </div>
+    <div class="card">
+      <h2>くじの種類設定</h2>
+      <div class="kuji-type-header"><span>名前</span><span style="text-align:center">枚数</span><span style="text-align:center">当たり?</span><span></span></div>
+      <div style="display:flex;flex-direction:column;gap:6px" id="kuji-types-list"></div>
+      <button class="add-row-btn" onclick="addKujiType()" style="margin-top:7px">＋ 種類を追加</button>
+    
+    <!-- PURCHASE RULES -->
+    <div class="card">
+      <h2>くじ・ガチャの特典ルール</h2>
+      <p style="font-size:0.74rem;color:var(--muted);margin-bottom:10px;line-height:1.6">購入した商品に応じて付与するくじ・ガチャの回数を設定します。<br>金額ベースのルールと組み合わせて使えます。</p>
+
+      <!-- amount-based -->
+      <div style="background:var(--bg2);border:1.5px solid var(--border);border-radius:14px;padding:12px 13px;margin-bottom:10px">
+        <div style="font-size:0.74rem;color:var(--purple);font-family:'Nunito',sans-serif;font-weight:900;margin-bottom:8px;">金額ベース</div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <div class="kuji-setting-row">
+            <label>購入</label>
+            <input class="num-input" type="number" id="kuji-per-yen" min="0" step="100" style="width:88px" oninput="kujiPerYen=parseInt(this.value)||0;saveAll();updateRulesPreview()">
+            <label>円につき くじ 1回</label>
+          </div>
+          <div class="kuji-setting-row">
+            <label>購入</label>
+            <input class="num-input" type="number" id="gacha-per-yen" min="0" step="100" style="width:88px" oninput="gachaPerYen=parseInt(this.value)||0;saveAll();updateRulesPreview()">
+            <label>円につき ガチャ 1回（0=無効）</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- product-based -->
+      <div style="background:var(--bg2);border:1.5px solid var(--border);border-radius:14px;padding:12px 13px">
+        <div style="font-size:0.74rem;color:var(--purple);font-family:'Nunito',sans-serif;font-weight:900;margin-bottom:8px;">商品ベース</div>
+        <div style="display:grid;grid-template-columns:1fr 60px 60px 30px;gap:6px;font-size:0.65rem;color:var(--muted);margin-bottom:4px;padding:0 2px;font-weight:700;">
+          <span>商品名</span><span style="text-align:center">くじ回数</span><span style="text-align:center">ガチャ回数</span><span></span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px" id="product-rules-list"></div>
+        <button class="add-row-btn" onclick="addProductRule()" style="margin-top:6px">＋ ルールを追加</button>
+      </div>
+
+      <div id="rules-preview" style="font-size:0.74rem;color:var(--purple);margin-top:8px;line-height:1.8;font-weight:700;"></div>
+    </div>
+
+    <button style="width:100%;max-width:420px;padding:12px;background:rgba(0,240,255,0.12);border:1px solid var(--neon);color:var(--paper);border:none;border-radius:10px;font-family:'Kaisei Opti',serif;font-size:0.88rem;letter-spacing:0.1em;cursor:pointer;box-shadow:0 3px 10px rgba(139,58,26,0.24)" onclick="applyAndGo()">設定を保存してガチャへ →</button>
+  </div>
+
+  <!-- ══ HISTORY ══ -->
+  <div class="panel" id="panel-history">
+    <button class="reset-btn" onclick="clearHistory()">履歴をリセット</button>
+    <div class="history-grid" id="history-grid"><div class="empty-msg">まだガチャを回していません</div></div>
+  </div>
+</div>
+
+<script>
+// ═══════ DEFAULTS ═══════
+const DEFAULT_EMOJIS=['🌸','⭐','🌙','🦋','🎀','🍀','🌺','🎵','🐱','🐶'];
+const DEFAULT_GACHA=[{id:1,image:null,name:'さくら',count:10},{id:2,image:null,name:'ほし',count:8},{id:3,image:null,name:'つき',count:5},{id:4,image:null,name:'ちょうちょ',count:3}];
+const DEFAULT_PRODS=[{id:1,name:'Tシャツ',price:2500},{id:2,name:'缶バッジセット',price:500},{id:3,name:'アクリルキーホルダー',price:800}];
+const DEFAULT_KUJI_TYPES=[{id:1,name:'1等',count:3,isWin:true},{id:2,name:'2等',count:10,isWin:true},{id:3,name:'ハズレ',count:50,isWin:false}];
+const PRESET_AMOUNTS=[500,1000,2000,3000,5000,10000];
+
+// ═══════ STATE ═══════
+let gachaItems=JSON.parse(JSON.stringify(DEFAULT_GACHA));
+let nextGachaId=5, remaining={}, initialCounts={};
+let pullHistory=[], rolling=false, pullCount=1;
+
+let regProducts=JSON.parse(JSON.stringify(DEFAULT_PRODS));
+let nextProdId=4;
+let kujiPerYen=500;
+let gachaPerYen=0; // 0 = disabled
+// product rules: [{id, name, kuji, gacha}]
+let productRules=[];
+let nextRuleId=1;
+let pendingGacha=0; // gacha pulls earned from register
+let cart=[];
+
+// sales data: {totalRevenue, txCount, productSales:{name->count}, receipts:[{time,items,total,paid,change,kuji}]}
+let salesData={totalRevenue:0,txCount:0,productSales:{},receipts:[]};
+
+let kujiTypes=JSON.parse(JSON.stringify(DEFAULT_KUJI_TYPES));
+let nextKujiTypeId=4;
+let lotTickets=0, lotInitTickets=0, lotHistory=[];
+
+// ═══════ LOCALSTORAGE ═══════
+const LS={GI:'g_items',REM:'g_rem',HIST:'g_hist',NID:'g_nid',PRODS:'g_prods',PNID:'g_pnid',KY:'g_ky',KT:'g_kt',KTNID:'g_ktnid',LT:'g_lt',LI:'g_li',LH:'g_lh',SALES:'g_sales',GPY:'g_gpy',PR:'g_pr',PRNID:'g_prnid',PG:'g_pg'};
+function saveAll(){
+  try{
+    localStorage.setItem(LS.GI,JSON.stringify(gachaItems));
+    localStorage.setItem(LS.REM,JSON.stringify(remaining));
+    localStorage.setItem(LS.HIST,JSON.stringify(pullHistory.map(h=>({name:h.item.name,image:h.item.image,time:h.time}))));
+    localStorage.setItem(LS.NID,String(nextGachaId));
+    localStorage.setItem(LS.PRODS,JSON.stringify(regProducts));
+    localStorage.setItem(LS.PNID,String(nextProdId));
+    localStorage.setItem(LS.KY,String(kujiPerYen));
+    localStorage.setItem(LS.KT,JSON.stringify(kujiTypes));
+    localStorage.setItem(LS.KTNID,String(nextKujiTypeId));
+    localStorage.setItem(LS.LT,String(lotTickets));
+    localStorage.setItem(LS.LI,String(lotInitTickets));
+    localStorage.setItem(LS.LH,JSON.stringify(lotHistory));
+    localStorage.setItem(LS.SALES,JSON.stringify(salesData));
+    localStorage.setItem(LS.GPY,String(gachaPerYen));
+    localStorage.setItem(LS.PR,JSON.stringify(productRules));
+    localStorage.setItem(LS.PRNID,String(nextRuleId));
+    localStorage.setItem(LS.PG,String(pendingGacha));
+  }catch(e){console.warn('save',e);}
+}
+function loadAll(){
+  try{
+    const gi=localStorage.getItem(LS.GI);if(gi)gachaItems=JSON.parse(gi);
+    const ni=localStorage.getItem(LS.NID);if(ni)nextGachaId=parseInt(ni);
+    const rr=localStorage.getItem(LS.REM);if(rr){const r=JSON.parse(rr);remaining={};Object.keys(r).forEach(k=>{remaining[parseInt(k)]=r[k];});}
+    const hh=localStorage.getItem(LS.HIST);if(hh)pullHistory=JSON.parse(hh).map(h=>({item:{name:h.name,image:h.image},time:h.time}));
+    const pp=localStorage.getItem(LS.PRODS);if(pp)regProducts=JSON.parse(pp);
+    const pn=localStorage.getItem(LS.PNID);if(pn)nextProdId=parseInt(pn);
+    const ky=localStorage.getItem(LS.KY);if(ky)kujiPerYen=parseInt(ky);
+    const kt=localStorage.getItem(LS.KT);if(kt)kujiTypes=JSON.parse(kt);
+    const kn=localStorage.getItem(LS.KTNID);if(kn)nextKujiTypeId=parseInt(kn);
+    const lt=localStorage.getItem(LS.LT);if(lt)lotTickets=parseInt(lt)||0;
+    const li=localStorage.getItem(LS.LI);if(li)lotInitTickets=parseInt(li)||0;
+    const lh=localStorage.getItem(LS.LH);if(lh)lotHistory=JSON.parse(lh);
+    const sd=localStorage.getItem(LS.SALES);if(sd)salesData=JSON.parse(sd);
+    const gpy=localStorage.getItem(LS.GPY);if(gpy)gachaPerYen=parseInt(gpy)||0;
+    const pr=localStorage.getItem(LS.PR);if(pr)productRules=JSON.parse(pr);
+    const prnid=localStorage.getItem(LS.PRNID);if(prnid)nextRuleId=parseInt(prnid);
+    const pg=localStorage.getItem(LS.PG);if(pg)pendingGacha=parseInt(pg)||0;
+  }catch(e){console.warn('load',e);}
+}
+loadAll();
+
+// ═══════ HELPERS ═══════
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function nowStr(){const d=new Date();return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');}
+function itemEmoji(idx){return DEFAULT_EMOJIS[Math.abs(idx)%DEFAULT_EMOJIS.length];}
+function fmtYen(n){return '¥'+Math.round(n).toLocaleString();}
+function calcKuji(cartItems){
+  const total=cartItems.reduce((s,c)=>s+c.price,0);
+  let n=kujiPerYen>0?Math.floor(total/kujiPerYen):0;
+  cartItems.forEach(c=>{
+    const rule=productRules.find(r=>r.name===c.name);
+    if(rule&&rule.kuji>0)n+=rule.kuji;
+  });
+  return n;
+}
+function calcGacha(cartItems){
+  const total=cartItems.reduce((s,c)=>s+c.price,0);
+  let n=gachaPerYen>0?Math.floor(total/gachaPerYen):0;
+  cartItems.forEach(c=>{
+    const rule=productRules.find(r=>r.name===c.name);
+    if(rule&&rule.gacha>0)n+=rule.gacha;
+  });
+  return n;
+}
+
+// ═══════ TABS ═══════
+function switchTab(name){
+  const tabs=['register','sales','lottery','gacha','setup','history'];
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',tabs[i]===name));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  if(name==='gacha')renderGachaPanel();
+  if(name==='history')renderHistory();
+  if(name==='register'){renderProductGrid();updateCartUI();}
+  if(name==='setup')renderSetup();
+  if(name==='lottery')renderLotteryPanel();
+  if(name==='sales')renderSales();
+}
+
+// ═══════ SETUP ═══════
+function renderSetup(){
+  document.getElementById('items-list').innerHTML=gachaItems.map((it,idx)=>{
+    const imgEl=it.image?`<img class="img-preview" src="${it.image}" onclick="triggerUpload(${it.id})">`:`<div class="img-placeholder" onclick="triggerUpload(${it.id})">${itemEmoji(idx)}</div>`;
+    return `<div class="item-row"><div class="img-upload-cell">${imgEl}<div class="img-upload-badge">＋</div><input class="img-file-input" id="file-${it.id}" type="file" accept="image/*" onchange="handleImgUpload(${it.id},this)"></div>
+      <input class="txt-input" type="text" placeholder="名前" value="${esc(it.name)}" oninput="updateGachaItem(${it.id},'name',this.value)">
+      <input class="num-input" type="number" min="0" max="9999" value="${it.count}" oninput="updateGachaItem(${it.id},'count',this.value)">
+      <button class="del-btn" onclick="deleteGachaItem(${it.id})">×</button></div>`;
+  }).join('');
+  updateGachaSummary();
+  document.getElementById('reg-products-list').innerHTML=regProducts.map(p=>`
+    <div class="reg-product-row">
+      <input class="txt-input" type="text" placeholder="商品名" value="${esc(p.name)}" oninput="updateRegProd(${p.id},'name',this.value)">
+      <input class="num-input" type="number" min="0" value="${p.price}" oninput="updateRegProd(${p.id},'price',this.value)">
+      <button class="del-btn" onclick="deleteRegProd(${p.id})">×</button>
+    </div>`).join('');
+  document.getElementById('kuji-types-list').innerHTML=kujiTypes.map(kt=>`
+    <div class="kuji-type-row">
+      <input class="txt-input" type="text" placeholder="名前" value="${esc(kt.name)}" oninput="updateKujiType(${kt.id},'name',this.value)">
+      <input class="num-input" type="number" min="0" value="${kt.count}" oninput="updateKujiType(${kt.id},'count',this.value)">
+      <select class="num-input" style="padding:6px 3px;font-size:0.78rem" onchange="updateKujiType(${kt.id},'isWin',this.value==='1')">
+        <option value="1" ${kt.isWin?'selected':''}>当たり</option>
+        <option value="0" ${!kt.isWin?'selected':''}>ハズレ</option>
+      </select>
+      <button class="del-btn" onclick="deleteKujiType(${kt.id})">×</button>
+    </div>`).join('');
+  renderProductRules();
+  updateRulesPreview();
+}
+function triggerUpload(id){document.getElementById('file-'+id).click();}
+function handleImgUpload(id,input){const f=input.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{const it=gachaItems.find(i=>i.id===id);if(it){it.image=e.target.result;renderSetup();saveAll();}};r.readAsDataURL(f);}
+function updateGachaItem(id,field,val){const it=gachaItems.find(i=>i.id===id);if(!it)return;if(field==='count')it.count=Math.max(0,parseInt(val)||0);else it[field]=val;updateGachaSummary();saveAll();}
+function addGachaItem(){gachaItems.push({id:nextGachaId,image:null,name:'',count:5});nextGachaId++;renderSetup();saveAll();}
+function deleteGachaItem(id){if(gachaItems.length<=1)return;gachaItems=gachaItems.filter(i=>i.id!==id);renderSetup();saveAll();}
+function updateGachaSummary(){const total=gachaItems.reduce((s,i)=>s+(i.count||0),0);document.getElementById('total-count').textContent=total;document.getElementById('kinds-count').textContent=gachaItems.length+' 種類';const warn=document.getElementById('stock-warning');const bad=gachaItems.filter(i=>!i.name.trim());if(bad.length){warn.style.display='block';warn.textContent='⚠ 名前未入力 '+bad.length+' 個';}else warn.style.display='none';}
+function applyAndGo(){initRemaining();switchTab('gacha');}
+function updateRegProd(id,field,val){const p=regProducts.find(x=>x.id===id);if(!p)return;if(field==='price')p.price=Math.max(0,parseInt(val)||0);else p[field]=val;saveAll();}
+function addRegProduct(){regProducts.push({id:nextProdId,name:'',price:0});nextProdId++;renderSetup();saveAll();}
+function deleteRegProd(id){regProducts=regProducts.filter(x=>x.id!==id);renderSetup();saveAll();}
+function updateKujiType(id,field,val){const kt=kujiTypes.find(x=>x.id===id);if(!kt)return;if(field==='count')kt.count=Math.max(0,parseInt(val)||0);else kt[field]=val;saveAll();}
+function addKujiType(){kujiTypes.push({id:nextKujiTypeId,name:'',count:5,isWin:false});nextKujiTypeId++;renderSetup();saveAll();}
+function deleteKujiType(id){if(kujiTypes.length<=1)return;kujiTypes=kujiTypes.filter(x=>x.id!==id);renderSetup();saveAll();}
+
+// ─ Product Rules ─
+function renderProductRules(){
+  const el=document.getElementById('product-rules-list');
+  if(!productRules.length){el.innerHTML='<div style="color:var(--muted);font-size:0.74rem;padding:4px 0">ルールがありません</div>';return;}
+  // build datalist of product names
+  const names=regProducts.map(p=>p.name).filter(Boolean);
+  const dlId='prod-name-list';
+  let dl=document.getElementById(dlId);
+  if(!dl){dl=document.createElement('datalist');dl.id=dlId;document.body.appendChild(dl);}
+  dl.innerHTML=names.map(n=>`<option value="${esc(n)}">`).join('');
+
+  el.innerHTML=productRules.map(r=>`
+    <div style="display:grid;grid-template-columns:1fr 60px 60px 30px;gap:6px;align-items:center">
+      <input class="txt-input" type="text" list="${dlId}" placeholder="商品名" value="${esc(r.name)}" oninput="updateProductRule(${r.id},'name',this.value)" style="font-size:0.8rem;padding:6px 8px">
+      <input class="num-input" type="number" min="0" value="${r.kuji}" oninput="updateProductRule(${r.id},'kuji',this.value)" style="font-size:0.8rem;padding:6px 4px">
+      <input class="num-input" type="number" min="0" value="${r.gacha}" oninput="updateProductRule(${r.id},'gacha',this.value)" style="font-size:0.8rem;padding:6px 4px">
+      <button class="del-btn" onclick="deleteProductRule(${r.id})">×</button>
+    </div>`).join('');
+}
+function addProductRule(){productRules.push({id:nextRuleId++,name:'',kuji:0,gacha:1});renderProductRules();updateRulesPreview();saveAll();}
+function deleteProductRule(id){productRules=productRules.filter(r=>r.id!==id);renderProductRules();updateRulesPreview();saveAll();}
+function updateProductRule(id,field,val){
+  const r=productRules.find(x=>x.id===id);if(!r)return;
+  if(field==='kuji'||field==='gacha')r[field]=Math.max(0,parseInt(val)||0);else r[field]=val;
+  updateRulesPreview();saveAll();
+}
+function updateRulesPreview(){
+  document.getElementById('kuji-per-yen').value=kujiPerYen||'';
+  document.getElementById('gacha-per-yen').value=gachaPerYen||'';
+  let lines=[];
+  if(kujiPerYen>0)lines.push(fmtYen(kujiPerYen)+' 購入 → くじ 1回');
+  if(gachaPerYen>0)lines.push(fmtYen(gachaPerYen)+' 購入 → ガチャ 1回');
+  productRules.forEach(r=>{
+    if(!r.name)return;
+    let parts=[];
+    if(r.kuji>0)parts.push('くじ '+r.kuji+'回');
+    if(r.gacha>0)parts.push('ガチャ '+r.gacha+'回');
+    if(parts.length)lines.push('「'+r.name+'」購入 → '+parts.join(' ＋ '));
+  });
+  document.getElementById('rules-preview').innerHTML=lines.length?lines.map(l=>'✦ '+l).join('<br>'):'（ルール未設定）';
+}
+
+// ═══════ REGISTER ═══════
+// product qty state: {prodId -> qty}
+const prodQty={};
+function getProdQty(id){return prodQty[id]||1;}
+function setProdQty(id,n){prodQty[id]=Math.max(1,Math.min(99,n));renderProductGrid();}
+
+function renderProductGrid(){
+  const g=document.getElementById('product-grid');
+  if(!regProducts.length){g.innerHTML='<div style="color:var(--muted);font-size:0.76rem">設定タブで商品を登録</div>';return;}
+  g.innerHTML=regProducts.map(p=>{
+    const q=getProdQty(p.id);
+    return `<div class="prod-btn">
+      <span class="prod-name">${esc(p.name)||'（名前なし）'}</span>
+      <span class="prod-price">${fmtYen(p.price)}</span>
+      <div class="prod-qty-row">
+        <button class="prod-qty-minus" onclick="event.stopPropagation();setProdQty(${p.id},${q}-1)">−</button>
+        <span class="prod-qty-num">${q}</span>
+        <button class="prod-qty-plus" onclick="event.stopPropagation();setProdQty(${p.id},${q}+1)">＋</button>
+      </div>
+      <button class="prod-qty-add" onclick="addToCartQty('${esc(p.name)}',${p.price},${q})">カートに追加</button>
+    </div>`;
+  }).join('');
+  // payment presets
+  const pp=document.getElementById('payment-presets');
+  pp.innerHTML=PRESET_AMOUNTS.map(a=>`<button class="preset-btn" onclick="setPreset(${a})">${fmtYen(a)}</button>`).join('');
+}
+
+function setPreset(amount){
+  document.getElementById('paid-amount').value=amount;
+  updateChange();
+}
+function setChokiri(){
+  const total=cartTotal();
+  document.getElementById('paid-amount').value=total;
+  updateChange();
+}
+
+function addToCart(name,price){cart.push({name,price});updateCartUI();}
+function addToCartQty(name,price,qty){for(let i=0;i<qty;i++)cart.push({name,price});updateCartUI();}
+function addManual(){const price=parseInt(document.getElementById('manual-amount').value)||0;const name=document.getElementById('manual-name').value.trim()||'手入力';if(price<=0)return;cart.push({name,price});document.getElementById('manual-amount').value='';document.getElementById('manual-name').value='';updateCartUI();}
+function removeFromCart(idx){cart.splice(idx,1);updateCartUI();}
+function removeOneFromCart(name,price){const i=cart.findLastIndex(c=>c.name===name&&c.price===price);if(i>=0){cart.splice(i,1);updateCartUI();}}
+function clearCart(){cart=[];document.getElementById('paid-amount').value='';updateCartUI();}
+function cartTotal(){return cart.reduce((s,c)=>s+c.price,0);}
+
+function updateChange(){
+  const total=cartTotal();
+  const paid=parseInt(document.getElementById('paid-amount').value)||0;
+  const disp=document.getElementById('change-display');
+  const amt=document.getElementById('change-amount');
+  if(!paid){disp.className='change-display zero';amt.className='change-amount zero';amt.textContent='—';return;}
+  const change=paid-total;
+  if(change>0){disp.className='change-display positive';amt.className='change-amount positive';amt.textContent=fmtYen(change);}
+  else if(change<0){disp.className='change-display negative';amt.className='change-amount negative';amt.textContent='不足 '+fmtYen(-change);}
+  else{disp.className='change-display zero';amt.className='change-amount zero';amt.textContent='ちょうど';}
+}
+
+function updateCartUI(){
+  const el=document.getElementById('cart-items');
+  if(!cart.length){el.innerHTML='<div class="cart-empty">商品を追加してください</div>';}
+  else{
+    // group by name+price
+    const grouped={};
+    cart.forEach(c=>{
+      const key=c.name+'__'+c.price;
+      if(!grouped[key])grouped[key]={name:c.name,price:c.price,count:0};
+      grouped[key].count++;
+    });
+    el.innerHTML=Object.values(grouped).map(g=>{
+      const qty=g.count>1?`<span style="font-size:0.75rem;color:var(--muted);font-weight:700;white-space:nowrap">×${g.count}</span>`:'';
+      const sub=g.count>1?`<span style="font-size:0.72rem;color:var(--muted)">${fmtYen(g.price*g.count)}</span>`:'';
+      return `<div class="cart-item-row">
+        <span class="cart-item-name">${esc(g.name)}</span>
+        ${qty}
+        ${sub}
+        <span class="cart-item-price">${fmtYen(g.price)}</span>
+        <button class="cart-del-btn" onclick="removeOneFromCart('${esc(g.name)}',${g.price})" title="1個削除">−</button>
+      </div>`;
+    }).join('');
+  }
+  const total=cartTotal();
+  const kujiTimes=calcKuji(cart);
+  const gachaTimes=calcGacha(cart);
+  document.getElementById('cart-total').textContent=fmtYen(total);
+  document.getElementById('kuji-times-disp').textContent=kujiTimes;
+  document.getElementById('gacha-times-disp').textContent=gachaTimes;
+  let ruleDesc=[];
+  if(kujiPerYen>0)ruleDesc.push('くじ:'+fmtYen(kujiPerYen)+'につき1回');
+  if(gachaPerYen>0)ruleDesc.push('ガチャ:'+fmtYen(gachaPerYen)+'につき1回');
+  document.getElementById('kuji-rule-disp').textContent=ruleDesc.join(' ／ ');
+  document.getElementById('checkout-btn').disabled=cart.length===0;
+  const cb=document.getElementById('chokiri-btn');if(cb)cb.style.display=cart.length>0?'':'none';
+  updateChange();
+}
+
+function doCheckout(){
+  if(!cart.length)return;
+  const total=cartTotal();
+  const paid=parseInt(document.getElementById('paid-amount').value)||0;
+  const change=paid>0?paid-total:null;
+  const kujiTimes=calcKuji(cart);
+  const gachaTimes=calcGacha(cart);
+
+  // record sales
+  salesData.totalRevenue+=total;
+  salesData.txCount+=1;
+  cart.forEach(c=>{
+    salesData.productSales[c.name]=(salesData.productSales[c.name]||{count:0,revenue:0});
+    salesData.productSales[c.name].count+=1;
+    salesData.productSales[c.name].revenue+=c.price;
+  });
+  const receipt={time:nowStr(),items:[...cart],total,paid,change,kuji:kujiTimes,gacha:gachaTimes};
+  salesData.receipts.unshift(receipt);
+  if(salesData.receipts.length>100)salesData.receipts.pop();
+
+  lotTickets+=kujiTimes;
+  lotInitTickets+=kujiTimes;
+  pendingGacha+=gachaTimes;
+  saveAll();
+
+  // build receipt HTML
+  let html='';
+  const grouped={};
+  cart.forEach(c=>{if(!grouped[c.name])grouped[c.name]={price:c.price,count:0};grouped[c.name].count++;});
+  Object.entries(grouped).forEach(([name,d])=>{
+    html+=`<div class="co-receipt-row"><span>${esc(name)}${d.count>1?' ×'+d.count:''}</span><span>${fmtYen(d.price*d.count)}</span></div>`;
+  });
+  html+=`<div class="co-receipt-row total"><span>合計</span><span>${fmtYen(total)}</span></div>`;
+  if(paid>0){
+    html+=`<div class="co-receipt-row paid"><span>お預かり</span><span>${fmtYen(paid)}</span></div>`;
+    html+=`<div class="co-receipt-row change"><span>お釣り</span><span>${change>=0?fmtYen(change):'不足 '+fmtYen(-change)}</span></div>`;
+  }
+  if(kujiTimes>0||gachaTimes>0){
+    let bonus=[];
+    if(kujiTimes>0)bonus.push('くじ×'+kujiTimes);
+    if(gachaTimes>0)bonus.push('ガチャ×'+gachaTimes);
+    html+='<div class="co-receipt-row" style="color:var(--green);font-size:0.76rem;font-weight:700;"><span>特典</span><span>'+bonus.join(' ／ ')+'</span></div>';
+  }
+  document.getElementById('co-receipt').innerHTML=html;
+  const kl=document.getElementById('co-kuji-line');
+  if(kujiTimes>0){kl.style.display='';document.getElementById('co-times').textContent=kujiTimes;}
+  else kl.style.display='none';
+  const gl=document.getElementById('co-gacha-line');
+  if(gachaTimes>0){gl.style.display='';document.getElementById('co-gacha-times').textContent=gachaTimes;}
+  else gl.style.display='none';
+  // set up sequential bonus navigation
+  const nb=document.getElementById('goto-next-btn');
+  if(nb){
+    if(kujiTimes>0||gachaTimes>0){
+      nb.style.display='';
+      nb.textContent=kujiTimes>0?'くじを引きに行く':'ガチャを引きに行く';
+      nb._bonusQueue=(kujiTimes>0&&gachaTimes>0)?['lottery','gacha']:(kujiTimes>0?['lottery']:['gacha']);
+    } else nb.style.display='none';
+  }
+
+  document.getElementById('checkout-overlay').classList.add('active');
+  cart=[];document.getElementById('paid-amount').value='';updateCartUI();
+}
+function closeCheckout(){document.getElementById('checkout-overlay').classList.remove('active');}
+function goToNextBonus(){
+  const nb=document.getElementById('goto-next-btn');
+  if(!nb||!nb._bonusQueue||!nb._bonusQueue.length){closeCheckout();return;}
+  const next=nb._bonusQueue.shift();
+  if(nb._bonusQueue.length===0){
+    closeCheckout();switchTab(next);
+  } else {
+    // still more bonuses — go to first, update button for next
+    closeCheckout();switchTab(next);
+    // after lottery, re-open checkout-like prompt for gacha
+    setTimeout(()=>{
+      if(nb._bonusQueue.length>0){
+        const remaining=nb._bonusQueue.shift();
+        if(confirm('続けてガチャを引きますか？'))switchTab(remaining);
+      }
+    },400);
+  }
+}
+function goToLotFromCheckout(){closeCheckout();switchTab('lottery');}
+function goToGachaFromCheckout(){closeCheckout();switchTab('gacha');}
+
+// ═══════ SALES ═══════
+function renderSales(){
+  const s=salesData;
+  document.getElementById('stat-total-revenue').textContent=fmtYen(s.totalRevenue);
+  document.getElementById('stat-tx-count').textContent=s.txCount+'件';
+  const totalItems=Object.values(s.productSales).reduce((a,v)=>a+v.count,0);
+  document.getElementById('stat-total-items').textContent=totalItems+'個';
+  document.getElementById('stat-avg').textContent=s.txCount>0?fmtYen(Math.round(s.totalRevenue/s.txCount)):'¥0';
+
+  // product breakdown
+  const list=document.getElementById('product-sales-list');
+  const entries=Object.entries(s.productSales).sort((a,b)=>b[1].count-a[1].count);
+  if(!entries.length){list.innerHTML='<div style="color:var(--muted);font-size:0.76rem;padding:6px 0">まだ売上がありません</div>';return;}
+  const maxCount=Math.max(...entries.map(e=>e[1].count));
+  list.innerHTML=entries.map(([name,d])=>`
+    <div class="product-sales-row">
+      <span class="ps-name">${esc(name)}</span>
+      <div class="ps-bar-wrap"><div class="ps-bar" style="width:${Math.round(d.count/maxCount*100)}%"></div></div>
+      <span class="ps-count">${d.count}個</span>
+      <span class="ps-revenue">${fmtYen(d.revenue)}</span>
+    </div>`).join('');
+
+  // receipts
+  const rl=document.getElementById('receipt-list');
+  if(!s.receipts.length){rl.innerHTML='<div style="color:var(--muted);font-size:0.76rem;padding:6px 0">まだ会計がありません</div>';return;}
+  rl.innerHTML=s.receipts.map(r=>{
+    const preview=r.items.map(i=>i.name).join('、');
+    const kujiHtml=r.kuji>0?`<span class="receipt-kuji-badge">くじ${r.kuji}回</span>`:'';
+    return `<div class="receipt-row">
+      <div class="receipt-top">
+        <span class="receipt-time">${r.time}</span>
+        ${kujiHtml}
+        <span class="receipt-total">${fmtYen(r.total)}</span>
+      </div>
+      <div class="receipt-items-preview">${esc(preview)}</div>
+    </div>`;
+  }).join('');
+}
+
+
+function exportPDF(){
+  const s=salesData;
+  const now=new Date();
+  const dateStr=now.getFullYear()+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日 '+
+    now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+
+  const totalItems=Object.values(s.productSales).reduce((a,v)=>a+v.count,0);
+  const avg=s.txCount>0?Math.round(s.totalRevenue/s.txCount):0;
+
+  // product rows
+  const entries=Object.entries(s.productSales).sort((a,b)=>b[1].count-a[1].count);
+  const prodRows=entries.length
+    ? entries.map(([name,d])=>`
+        <tr>
+          <td style="padding:5px 8px;border-bottom:1px solid #eee">${esc(name)}</td>
+          <td style="padding:5px 8px;border-bottom:1px solid #eee;text-align:right">${d.count}個</td>
+          <td style="padding:5px 8px;border-bottom:1px solid #eee;text-align:right">${fmtYen(d.revenue)}</td>
+        </tr>`).join('')
+    : '<tr><td colspan="3" style="padding:8px;color:#888;text-align:center">データなし</td></tr>';
+
+  // receipt rows (max 100)
+  const recRows=s.receipts.length
+    ? s.receipts.slice(0,100).map((r,i)=>{
+        const items=r.items.map(it=>it.name).join('、');
+        const bonus=[];
+        if(r.kuji>0)bonus.push('くじ×'+r.kuji);
+        if(r.gacha>0)bonus.push('ガチャ×'+r.gacha);
+        return `<tr style="background:${i%2===0?'#fff':'#f9f9f9'}">
+          <td style="padding:4px 7px;border-bottom:1px solid #eee;font-size:9pt">${r.time||'—'}</td>
+          <td style="padding:4px 7px;border-bottom:1px solid #eee;font-size:8.5pt;color:#444">${esc(items)}</td>
+          <td style="padding:4px 7px;border-bottom:1px solid #eee;text-align:right;font-weight:700">${fmtYen(r.total)}</td>
+          <td style="padding:4px 7px;border-bottom:1px solid #eee;font-size:8.5pt;color:#666">${r.paid>0?fmtYen(r.paid):''}</td>
+          <td style="padding:4px 7px;border-bottom:1px solid #eee;font-size:8.5pt;color:#888">${bonus.join(' ')}</td>
+        </tr>`;
+      }).join('')
+    : '<tr><td colspan="5" style="padding:8px;color:#888;text-align:center">データなし</td></tr>';
+
+  const html=`
+    <div style="border-bottom:3px solid #111;padding-bottom:10px;margin-bottom:20px">
+      <div style="font-size:22pt;font-weight:900;letter-spacing:0.04em">StallKit</div>
+      <div style="font-size:11pt;color:#555;margin-top:3px">売上レポート</div>
+      <div style="font-size:9pt;color:#888;margin-top:2px">出力日時：${dateStr}</div>
+    </div>
+
+    <div style="margin-bottom:20px">
+      <div style="font-size:12pt;font-weight:700;border-left:4px solid #111;padding-left:10px;margin-bottom:10px">サマリー</div>
+      <table style="width:100%;border-collapse:collapse">
+        <tr>
+          <td style="padding:8px 12px;background:#f4f4f4;border-radius:4px;width:25%">
+            <div style="font-size:8pt;color:#666;margin-bottom:2px">総売上</div>
+            <div style="font-size:16pt;font-weight:900;color:#111">${fmtYen(s.totalRevenue)}</div>
+          </td>
+          <td style="width:4%"></td>
+          <td style="padding:8px 12px;background:#f4f4f4;border-radius:4px;width:25%">
+            <div style="font-size:8pt;color:#666;margin-bottom:2px">取引件数</div>
+            <div style="font-size:16pt;font-weight:900;color:#111">${s.txCount}件</div>
+          </td>
+          <td style="width:4%"></td>
+          <td style="padding:8px 12px;background:#f4f4f4;border-radius:4px;width:25%">
+            <div style="font-size:8pt;color:#666;margin-bottom:2px">総販売数</div>
+            <div style="font-size:16pt;font-weight:900;color:#111">${totalItems}個</div>
+          </td>
+          <td style="width:4%"></td>
+          <td style="padding:8px 12px;background:#f4f4f4;border-radius:4px;width:25%">
+            <div style="font-size:8pt;color:#666;margin-bottom:2px">平均客単価</div>
+            <div style="font-size:16pt;font-weight:900;color:#111">${fmtYen(avg)}</div>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <div style="margin-bottom:20px">
+      <div style="font-size:12pt;font-weight:700;border-left:4px solid #111;padding-left:10px;margin-bottom:10px">商品別 販売数</div>
+      <table style="width:100%;border-collapse:collapse;font-size:10pt">
+        <thead>
+          <tr style="background:#111;color:#fff">
+            <th style="padding:6px 8px;text-align:left;font-weight:700">商品名</th>
+            <th style="padding:6px 8px;text-align:right;font-weight:700">販売数</th>
+            <th style="padding:6px 8px;text-align:right;font-weight:700">売上</th>
+          </tr>
+        </thead>
+        <tbody>${prodRows}</tbody>
+        <tfoot>
+          <tr style="background:#f0f0f0;font-weight:700">
+            <td style="padding:6px 8px;border-top:2px solid #111">合計</td>
+            <td style="padding:6px 8px;border-top:2px solid #111;text-align:right">${totalItems}個</td>
+            <td style="padding:6px 8px;border-top:2px solid #111;text-align:right">${fmtYen(s.totalRevenue)}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <div>
+      <div style="font-size:12pt;font-weight:700;border-left:4px solid #111;padding-left:10px;margin-bottom:10px">
+        会計履歴${s.receipts.length>100?' （最新100件）':''}
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-size:9.5pt">
+        <thead>
+          <tr style="background:#111;color:#fff">
+            <th style="padding:5px 7px;text-align:left;font-weight:700;white-space:nowrap">時刻</th>
+            <th style="padding:5px 7px;text-align:left;font-weight:700">商品</th>
+            <th style="padding:5px 7px;text-align:right;font-weight:700;white-space:nowrap">合計</th>
+            <th style="padding:5px 7px;text-align:right;font-weight:700;white-space:nowrap">お預かり</th>
+            <th style="padding:5px 7px;text-align:left;font-weight:700;white-space:nowrap">特典</th>
+          </tr>
+        </thead>
+        <tbody>${recRows}</tbody>
+      </table>
+    </div>
+    <div style="margin-top:24px;padding-top:10px;border-top:1px solid #ccc;font-size:8pt;color:#aaa;text-align:right">
+      Powered by StallKit
+    </div>
+  `;
+
+  const report=document.getElementById('pdf-report');
+  report.innerHTML=html;
+  report.style.display='block';
+  window.print();
+  setTimeout(()=>{ report.style.display='none'; }, 500);
+}
+
+function resetSales(){
+  if(!confirm('売上データをリセットしますか？この操作は元に戻せません。'))return;
+  salesData={totalRevenue:0,txCount:0,productSales:{},receipts:[]};
+  saveAll();renderSales();
+}
+
+// ═══════ LOTTERY ═══════
+function buildLotPool(){const p=[];kujiTypes.forEach(kt=>{for(let i=0;i<kt.count;i++)p.push({label:kt.name,isWin:kt.isWin});});return p;}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function drawTickets(n){const pool=shuffle(buildLotPool());const draws=[];for(let i=0;i<n&&i<pool.length;i++)draws.push(pool[i]);while(draws.length<n){const p=buildLotPool();if(!p.length)break;draws.push(p[Math.floor(Math.random()*p.length)]);}return draws;}
+
+function renderLotteryPanel(){
+  const total=lotInitTickets;
+  document.getElementById('lot-ticket-num').textContent=lotTickets;
+  document.getElementById('lot-ticket-num').style.color=lotTickets>0?'var(--accent)':'var(--muted)';
+  document.getElementById('lot-rem-num').textContent=lotTickets+' / '+total;
+  document.getElementById('lot-rem-fill').style.width=(total>0?(lotTickets/total)*100:0)+'%';
+  const sel=document.getElementById('draw-all-select');
+  sel.innerHTML='<option value="0">枚数…</option>';
+  for(let i=2;i<=Math.min(lotTickets,20);i++)sel.add(new Option(i+'枚まとめて',i));
+  document.getElementById('draw-all-btn').disabled=lotTickets<2;
+  document.getElementById('lottery-box').textContent=lotTickets>0?'✦':'—';
+  renderLotHistory();
+}
+function renderLotHistory(){
+  const el=document.getElementById('lot-result-list');
+  if(!lotHistory.length){el.innerHTML='';return;}
+  el.innerHTML=lotHistory.slice(0,20).map((h,i)=>`
+    <div class="lot-result-card ${h.isWin?'win':'lose'}" style="animation-delay:${i*0.04}s">
+      <span class="lot-result-icon">${h.isWin?'◎':'×'}</span>
+      <span class="lot-result-label ${h.isWin?'win':'lose'}">${esc(h.label)}</span>
+      <span class="lot-result-time">${h.time}</span>
+    </div>`).join('');
+}
+function doDrawOne(){
+  if(lotTickets<=0)return;
+  const box=document.getElementById('lottery-box');
+  box.classList.add('drawing');setTimeout(()=>box.classList.remove('drawing'),450);
+  const result=drawTickets(1)[0];
+  lotTickets=Math.max(0,lotTickets-1);
+  lotHistory.unshift({label:result.label,isWin:result.isWin,time:nowStr()});
+  saveAll();renderLotteryPanel();showLotSingle(result);
+}
+function doDrawAll(){
+  const n=parseInt(document.getElementById('draw-all-select').value)||0;
+  if(n<1||lotTickets<n)return;
+  const results=drawTickets(n);
+  lotTickets=Math.max(0,lotTickets-n);
+  results.forEach(r=>lotHistory.unshift({label:r.label,isWin:r.isWin,time:nowStr()}));
+  saveAll();renderLotteryPanel();showLotMulti(results);
+}
+function showLotSingle(r){
+  document.getElementById('lot-single-popup').style.display='';document.getElementById('lot-multi-popup').style.display='none';
+  document.getElementById('lot-single-popup').className='lot-result-popup '+(r.isWin?'win-popup':'lose-popup');
+  document.getElementById('lot-icon').textContent=r.isWin?'◎':'×';
+  document.getElementById('lot-label').textContent=r.label;document.getElementById('lot-label').className='lot-big-label '+(r.isWin?'win':'lose');
+  document.getElementById('lot-sub').textContent=r.isWin?'おめでとうございます！':'またチャレンジしてね！';
+  document.getElementById('lot-result-overlay').classList.add('active');
+  if(r.isWin)spawnConfetti();
+}
+function showLotMulti(results){
+  document.getElementById('lot-single-popup').style.display='none';document.getElementById('lot-multi-popup').style.display='';
+  const wins=results.filter(r=>r.isWin).length;
+  document.getElementById('lot-multi-title').textContent='✦ '+results.length+'枚の結果 ✦  当たり '+wins+'本';
+  document.getElementById('lot-multi-grid').innerHTML=results.map((r,i)=>`<div class="multi-lot-card ${r.isWin?'win':'lose'}" style="animation-delay:${i*0.05}s"><span class="multi-lot-card-icon">${r.isWin?'◎':'×'}</span><span class="multi-lot-card-label ${r.isWin?'win':'lose'}">${esc(r.label)}</span></div>`).join('');
+  document.getElementById('lot-result-overlay').classList.add('active');
+  if(wins>0)spawnConfetti();
+}
+function closeLotResult(){document.getElementById('lot-result-overlay').classList.remove('active');stopConfetti();}
+
+// ═══════ GACHA ═══════
+function initRemaining(){remaining={};initialCounts={};gachaItems.forEach(it=>{remaining[it.id]=it.count;initialCounts[it.id]=it.count;});saveAll();}
+function totalRem(){return gachaItems.reduce((s,it)=>s+(remaining[it.id]||0),0);}
+function totalInit(){return gachaItems.reduce((s,it)=>s+(initialCounts[it.id]||0),0);}
+function updatePullBtn(){
+  const t=totalRem();const b=document.getElementById('pull-btn');b.disabled=t===0;
+  const base=t===0?'在庫なし':pullCount>1?pullCount+'連ガチャを回す':'ガチャを回す';
+  b.textContent=pendingGacha>0&&t>0?base+' (権利残'+pendingGacha+'回)':base;
+  // pending badge
+  const badge=document.getElementById('pending-gacha-badge');
+  if(badge){badge.style.display=pendingGacha>0?'flex':'none';if(pendingGacha>0)badge.textContent=pendingGacha;}
+}
+function renderGachaPanel(){
+  const t=totalRem(),i=totalInit();
+  document.getElementById('remaining-num').textContent=t+' 個';
+  document.getElementById('remaining-fill').style.width=(i>0?(t/i)*100:0)+'%';
+  const sel=document.getElementById('count-select');
+  if(parseInt(sel.value)>t&&t>0){sel.value='1';pullCount=1;}
+  Array.from(sel.options).forEach(o=>{o.disabled=parseInt(o.value)>t;});
+  updatePullBtn();
+  if(!rolling){const inn=document.getElementById('capsule-inner');if(inn)inn.textContent=t===0?'—':'✦';}
+  // auto-hint pending gacha count in select
+  if(pendingGacha>0&&t>0){
+    const auto=Math.min(pendingGacha,10,t);
+    const sel=document.getElementById('count-select');
+    if(parseInt(sel.value)!==auto){sel.value=String(auto);pullCount=auto;}
+  }
+  document.getElementById('gacha-stock-list').innerHTML=gachaItems.map((it,idx)=>{
+    const rem=remaining[it.id]||0,ini=initialCounts[it.id]||1,p=Math.round((rem/ini)*100);
+    const th=it.image?`<img class="stock-item-img" src="${it.image}">`:`<div class="stock-item-ph">${itemEmoji(idx)}</div>`;
+    return `<div class="stock-item-row ${rem===0?'stock-zero':''}">${th}<span class="stock-item-name">${esc(it.name)||'（名前なし）'}</span><div class="stock-item-bar"><div class="stock-item-fill" style="width:${p}%"></div></div><span class="stock-item-count">${rem}</span></div>`;
+  }).join('');
+}
+function pickOne(){const pool=[];gachaItems.forEach(it=>{for(let i=0;i<(remaining[it.id]||0);i++)pool.push(it.id);});if(!pool.length)return null;const id=pool[Math.floor(Math.random()*pool.length)];const item=gachaItems.find(i=>i.id===id);remaining[id]=Math.max(0,(remaining[id]||0)-1);return item;}
+function doPull(){
+  if(rolling||totalRem()===0)return;
+  const count=Math.min(pullCount,totalRem());rolling=true;
+  const cap=document.getElementById('capsule');cap.classList.add('rolling');
+  cap.innerHTML='<span id="capsule-inner" style="font-size:2rem;letter-spacing:1px">...</span>';
+  cap.insertAdjacentHTML('afterbegin','<span style="position:absolute;top:10%;left:18%;width:40%;height:28%;background:rgba(255,255,255,0.34);border-radius:50%;transform:rotate(-20deg);pointer-events:none"></span>');
+  setTimeout(()=>{
+    cap.classList.remove('rolling');rolling=false;
+    const results=[];for(let i=0;i<count;i++){const it=pickOne();if(it)results.push(it);}
+    results.forEach(it=>pullHistory.unshift({item:it,time:nowStr()}));
+    if(pendingGacha>0){pendingGacha=Math.max(0,pendingGacha-count);}
+    saveAll();
+    const last=results[results.length-1];
+    if(last.image){cap.innerHTML=`<span style="position:absolute;top:10%;left:18%;width:40%;height:28%;background:rgba(255,255,255,0.34);border-radius:50%;transform:rotate(-20deg);pointer-events:none;z-index:1"></span><img src="${last.image}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;}
+    else{cap.innerHTML=`<span style="position:absolute;top:10%;left:18%;width:40%;height:28%;background:rgba(255,255,255,0.34);border-radius:50%;transform:rotate(-20deg);pointer-events:none"></span><span id="capsule-inner" style="font-size:3.8rem">${itemEmoji(gachaItems.indexOf(last))}</span>`;}
+    if(results.length===1)showSingleResult(results[0]);else showMultiResult(results);
+    // reset capsule to idle icon after showing result
+    setTimeout(()=>{
+      const c=document.getElementById('capsule');
+      if(c){c.innerHTML='<span style="position:absolute;top:10%;left:18%;width:40%;height:28%;background:rgba(255,255,255,0.34);border-radius:50%;transform:rotate(-20deg);pointer-events:none"></span><span id="capsule-inner" style="font-size:2.6rem;letter-spacing:-2px">✦✦</span>';}
+    },800);
+    renderGachaPanel();
+  },680);
+}
+function showSingleResult(item){
+  document.getElementById('single-popup').style.display='';document.getElementById('multi-popup').style.display='none';
+  const wrap=document.getElementById('res-img-wrap');const idx=gachaItems.indexOf(item);
+  wrap.innerHTML=item.image?`<img src="${item.image}">`:(itemEmoji(idx));
+  document.getElementById('res-name').textContent=item.name||'（名前なし）';
+  document.getElementById('res-meta').textContent='残り '+(remaining[item.id]||0)+' 個';
+  document.getElementById('result-overlay').classList.add('active');spawnConfetti();
+}
+function showMultiResult(results){
+  document.getElementById('single-popup').style.display='none';document.getElementById('multi-popup').style.display='';
+  document.getElementById('multi-title').textContent='✦ '+results.length+'連結果 ✦';
+  document.getElementById('multi-grid').innerHTML=results.map((item,i)=>{const idx=gachaItems.indexOf(item);const th=item.image?`<img class="multi-badge-img" src="${item.image}">`:`<div class="multi-badge-ph">${itemEmoji(idx)}</div>`;return `<div class="multi-badge-card" style="animation-delay:${i*0.06}s">${th}<span class="multi-badge-name">${esc(item.name)||'（名前なし）'}</span></div>`;}).join('');
+  document.getElementById('result-overlay').classList.add('active');spawnConfetti();
+}
+function closeResult(){document.getElementById('result-overlay').classList.remove('active');stopConfetti();}
+
+// ═══════ CONFETTI ═══════
+const cc=document.getElementById('confetti-canvas');const cx2=cc.getContext('2d');let cParts=[],cFrame=null;
+function resizeCC(){cc.width=window.innerWidth;cc.height=window.innerHeight;}resizeCC();window.addEventListener('resize',resizeCC);
+function spawnConfetti(){cParts=[];const cols=['#ff6eb4','#a855f7','#fbbf24','#10b981','#22d3ee','#f43f5e','#fff'];for(let i=0;i<90;i++)cParts.push({x:cc.width/2+(Math.random()-.5)*80,y:cc.height*.44,vx:(Math.random()-.5)*12,vy:-(4+Math.random()*10),color:cols[Math.floor(Math.random()*cols.length)],size:5+Math.random()*9,rot:Math.random()*Math.PI*2,rotV:(Math.random()-.5)*.28,alpha:1,shape:Math.random()>.5?'rect':'circle'});if(cFrame)cancelAnimationFrame(cFrame);animC();}
+function animC(){cx2.clearRect(0,0,cc.width,cc.height);cParts=cParts.filter(p=>p.alpha>.02);cParts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.22;p.vx*=.985;p.rot+=p.rotV;p.alpha-=.013;cx2.save();cx2.globalAlpha=Math.max(0,p.alpha);cx2.translate(p.x,p.y);cx2.rotate(p.rot);cx2.fillStyle=p.color;if(p.shape==='rect')cx2.fillRect(-p.size/2,-p.size*.3,p.size,p.size*.6);else{cx2.beginPath();cx2.arc(0,0,p.size*.45,0,Math.PI*2);cx2.fill();}cx2.restore();});if(cParts.length>0)cFrame=requestAnimationFrame(animC);else cx2.clearRect(0,0,cc.width,cc.height);}
+function stopConfetti(){if(cFrame)cancelAnimationFrame(cFrame);cx2.clearRect(0,0,cc.width,cc.height);cParts=[];}
+
+// ═══════ HISTORY ═══════
+function renderHistory(){
+  const grid=document.getElementById('history-grid');
+  if(!pullHistory.length){grid.innerHTML='<div class="empty-msg">まだガチャを回していません</div>';return;}
+  grid.innerHTML=pullHistory.map((h,i)=>{const idx=gachaItems.indexOf(h.item);const th=h.item.image?`<img class="h-img" src="${h.item.image}">`:`<div class="h-ph">${itemEmoji(idx>=0?idx:i)}</div>`;return `<div class="history-card" style="animation-delay:${i*.04}s">${th}<span class="h-name">${esc(h.item.name)||'（名前なし）'}</span><span class="h-time">${h.time}</span></div>`;}).join('');
+}
+function clearHistory(){if(!confirm('履歴をリセットしますか？'))return;pullHistory=[];saveAll();renderHistory();}
+
+
+// ═══════ THEME ═══════
+
+// ─ Logo per theme ─
+function renderLogo(theme){
+  const el=document.getElementById('logo-wrap');
+  if(!el)return;
+  const logos={
+    fancy: `<svg viewBox="0 0 280 64" width="280" height="64" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="lg-f" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#ff6eb4"/>
+          <stop offset="50%" stop-color="#a855f7"/>
+          <stop offset="100%" stop-color="#22d3ee"/>
+        </linearGradient>
+      </defs>
+      <text x="140" y="46" text-anchor="middle"
+        font-family="Nunito,sans-serif" font-weight="900" font-size="44"
+        fill="url(#lg-f)" letter-spacing="1">StallKit</text>
+      <text x="140" y="62" text-anchor="middle"
+        font-family="Nunito Sans,sans-serif" font-weight="700" font-size="10"
+        fill="#a855f7" letter-spacing="6" opacity="0.7">SHOP · LOTTERY · GACHA</text>
+    </svg>`,
+
+    neon: `<svg viewBox="0 0 300 70" width="300" height="70" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="glow-n" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <text x="150" y="46" text-anchor="middle"
+        font-family="Orbitron,monospace" font-weight="900" font-size="40"
+        fill="#00f0ff" filter="url(#glow-n)" letter-spacing="2">StallKit</text>
+      <text x="150" y="62" text-anchor="middle"
+        font-family="Orbitron,monospace" font-weight="400" font-size="9"
+        fill="#bf00ff" letter-spacing="5" filter="url(#glow-n)">SHOP / LOTTERY / GACHA</text>
+    </svg>`,
+
+    wabi: `<svg viewBox="0 0 300 72" width="300" height="72" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="lg-w" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#8b3a1a"/>
+          <stop offset="100%" stop-color="#c8a84b"/>
+        </linearGradient>
+      </defs>
+      <line x1="20" y1="34" x2="100" y2="34" stroke="#c8a84b" stroke-width="1" opacity="0.6"/>
+      <line x1="200" y1="34" x2="280" y2="34" stroke="#c8a84b" stroke-width="1" opacity="0.6"/>
+      <text x="150" y="42" text-anchor="middle"
+        font-family="Zen Kaku Gothic New,Noto Sans JP,serif" font-weight="900" font-size="36"
+        fill="url(#lg-w)" letter-spacing="4">StallKit</text>
+      <text x="150" y="60" text-anchor="middle"
+        font-family="Zen Kaku Gothic New,Noto Sans JP,serif" font-weight="400" font-size="10"
+        fill="#8a7060" letter-spacing="8">物販・くじ・ガチャ</text>
+    </svg>`,
+
+    mono: `<svg viewBox="0 0 300 68" width="300" height="68" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="0" width="300" height="68" fill="none"/>
+      <rect x="8" y="8" width="284" height="52" fill="none" stroke="#111" stroke-width="2"/>
+      <rect x="14" y="14" width="272" height="40" fill="none" stroke="#111" stroke-width="0.5" opacity="0.3"/>
+      <text x="150" y="42" text-anchor="middle"
+        font-family="DM Mono,monospace" font-weight="500" font-size="32"
+        fill="#111" letter-spacing="3">StallKit</text>
+      <text x="150" y="54" text-anchor="middle"
+        font-family="DM Mono,monospace" font-weight="400" font-size="7"
+        fill="#888" letter-spacing="6">SHOP · LOTTERY · GACHA</text>
+    </svg>`
+  };
+  el.innerHTML = logos[theme] || logos.fancy;
+}
+const THEMES=['fancy','neon','wabi','mono'];
+function setTheme(t){
+  document.documentElement.setAttribute('data-theme',t);
+  THEMES.forEach(x=>{
+    const b=document.getElementById('tbtn-'+x);
+    if(b)b.classList.toggle('active',x===t);
+  });
+  localStorage.setItem('stallkit_theme',t);
+  renderLogo(t);
+}
+// load saved theme
+(function(){
+  const saved=localStorage.getItem('stallkit_theme')||'fancy';
+  document.documentElement.setAttribute('data-theme',saved);
+  // buttons will be ready after DOM, set active state after slight delay
+  setTimeout(()=>{
+    THEMES.forEach(x=>{
+      const b=document.getElementById('tbtn-'+x);
+      if(b)b.classList.toggle('active',x===saved);
+    });
+    renderLogo(saved);
+  },0);
+})();
+
+// ═══════ INIT ═══════
+gachaItems.forEach(it=>{initialCounts[it.id]=it.count;if(!(it.id in remaining))remaining[it.id]=it.count;});
+renderProductGrid();updateCartUI();renderGachaPanel();
+</script>
+</body>
+</html>
